@@ -1,0 +1,40 @@
+{
+  "$schema": "https://tree-sitter.github.io/tree-sitter/assets/schemas/config.schema.json",
+  "grammars": [
+    {
+      "name": "peeper",
+      "camelcase": "Peeper",
+      "title": "Peeper",
+      "scope": "source.peeper",
+      "file-types": [
+        "peep"
+      ],
+      "injection-regex": "^peeper$",
+      "class-name": "TreeSitterPeeper"
+    }
+  ],
+  "metadata": {
+    "version": "0.0.1",
+    "license": "MIT",
+    "description": "Peeper language",
+    "authors": [
+      {
+        "name": "Fuad Hasan",
+        "email": "fuad.cs22@gmail.com",
+        "url": "https://github.com/itsfuad"
+      }
+    ],
+    "links": {
+      "repository": "https://github.com/PeeperLanguage/tree_sitter_peeper"
+    }
+  },
+  "bindings": {
+    "c": true,
+    "go": true,
+    "node": true,
+    "python": true,
+    "rust": true,
+    "swift": true,
+    "zig": false
+  }
+}
