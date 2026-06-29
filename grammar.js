@@ -26,7 +26,12 @@ export default grammar({
 
   word: ($) => $.identifier,
 
-  extras: ($) => [/[\s\uFEFF\u2060\u200B]/, $.line_comment, $.block_comment],
+  extras: ($) => [
+    /[\s\uFEFF\u2060\u200B]/,
+    $.doc_comment,
+    $.line_comment,
+    $.block_comment,
+  ],
 
   supertypes: ($) => [$.statement, $.expression, $.type],
 
@@ -488,7 +493,7 @@ export default grammar({
         PREC.prefix,
         choice(
           seq(
-            choice("-", "!", "?", $.comptime, $.move),
+            choice("-", "!", "?", "@", $.comptime, $.move),
             field("value", $.expression),
           ),
         ),
@@ -687,6 +692,7 @@ export default grammar({
     byte_literal: ($) => token(/b'(?:\\.|[^'\\\n])+'/),
 
     identifier: () => /[A-Za-z_][A-Za-z0-9_]*/,
+    doc_comment: () => token(prec(1, /\/\/\/[^\n]*/)),
     line_comment: () => token(/\/\/[^\n]*/),
     block_comment: () => token(/\/\*[^*]*\*+([^/*][^*]*\*+)*\//),
   },
