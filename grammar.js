@@ -12,15 +12,40 @@ const PREC = {
   postfix: 10,
 };
 
-const HEX_NUMBER = /0[xX][0-9A-Za-z](?:[0-9A-Za-z]|_[0-9A-Za-z])*/;
-const OCT_NUMBER = /0[oO][0-9A-Za-z](?:[0-9A-Za-z]|_[0-9A-Za-z])*/;
-const BIN_NUMBER = /0[bB][0-9A-Za-z](?:[0-9A-Za-z]|_[0-9A-Za-z])*/;
-const DEC_NUMBER = /[0-9](?:[0-9]|_[0-9])*/;
-const FLOAT_NUMBER =
-  /[0-9](?:[0-9]|_[0-9])*(?:\.[0-9](?:[0-9]|_[0-9])*)?(?:[eE][+-]?[0-9](?:[0-9]|_[0-9])*)?/;
-const IMAG_NUMBER =
-  /[0-9](?:[0-9]|_[0-9])*(?:\.[0-9](?:[0-9]|_[0-9])*)?(?:[eE][+-]?[0-9](?:[0-9]|_[0-9])*)?i/;
+const NUMBER_POSTFIX = /[iuf](?:[0-9](?:[0-9]|_[0-9])*)?/;
 
+const HEX_NUMBER = new RegExp(
+  String.raw`0[xX][0-9A-Fa-f](?:[0-9A-Fa-f]|_[0-9A-Fa-f])*` +
+  String.raw`(?:${NUMBER_POSTFIX.source})?`
+);
+
+const OCT_NUMBER = new RegExp(
+  String.raw`0[oO][0-7](?:[0-7]|_[0-7])*` +
+  String.raw`(?:${NUMBER_POSTFIX.source})?`
+);
+
+const BIN_NUMBER = new RegExp(
+  String.raw`0[bB][01](?:[01]|_[01])*` +
+  String.raw`(?:${NUMBER_POSTFIX.source})?`
+);
+
+const DEC_NUMBER = new RegExp(
+  String.raw`[0-9](?:[0-9]|_[0-9])*` +
+  String.raw`(?:${NUMBER_POSTFIX.source})?`
+);
+
+const FLOAT_NUMBER = new RegExp(
+  String.raw`[0-9](?:[0-9]|_[0-9])*` +
+  String.raw`(?:\.[0-9](?:[0-9]|_[0-9])*)?` +
+  String.raw`(?:[eE][+-]?[0-9](?:[0-9]|_[0-9])*)?` +
+  String.raw`(?:${NUMBER_POSTFIX.source})?`
+);
+
+const IMAG_NUMBER = new RegExp(
+  String.raw`[0-9](?:[0-9]|_[0-9])*` +
+  String.raw`(?:\.[0-9](?:[0-9]|_[0-9])*)?` +
+  String.raw`(?:[eE][+-]?[0-9](?:[0-9]|_[0-9])*)?i`
+);
 export default grammar({
   name: "peeper",
 
