@@ -86,6 +86,7 @@ export default grammar({
     const: () => "const",
     mut: () => "mut",
     self: () => "self",
+    iface: () => "iface",
 
     top_level_item: ($) =>
       choice(
@@ -96,7 +97,6 @@ export default grammar({
         seq(repeat(field("attribute", $.attribute)), $.struct_declaration),
         seq(repeat(field("attribute", $.attribute)), $.interface_declaration),
         seq(repeat(field("attribute", $.attribute)), $.enum_declaration),
-        $.impl_declaration,
         $.function_declaration,
       ),
 
@@ -147,7 +147,7 @@ export default grammar({
 
     interface_declaration: ($) =>
       seq(
-        "interface",
+        $.iface,
         field("name", $.identifier),
         optional(field("type_parameters", $.type_parameter_list)),
         "{",
@@ -165,16 +165,6 @@ export default grammar({
         "{",
         optional(commaSep1($.identifier)),
         optional(","),
-        "}",
-        optional(";"),
-      ),
-
-    impl_declaration: ($) =>
-      seq(
-        "impl",
-        field("target", $.type),
-        "{",
-        repeat($.function_declaration),
         "}",
         optional(";"),
       ),
@@ -207,12 +197,16 @@ export default grammar({
         repeat(field("attribute", $.attribute)),
         optional("unsafe"),
         "fn",
+        optional(field("receiver", $.receiver)),
         field("name", $.identifier),
         optional(field("type_parameters", $.type_parameter_list)),
         field("parameters", $.parameter_list),
         optional(seq("->", field("result", $.type))),
         choice(field("body", $.block), ";"),
       ),
+
+    receiver: ($) =>
+      seq("(", field("parameter", $.typed_parameter), ")"),
 
     type_parameter_list: ($) =>
       seq("<", commaSep1($.type_parameter), optional(","), ">"),
@@ -610,6 +604,7 @@ export default grammar({
         $.error_union_type,
         $.function_type,
         $.optional_type,
+        $.reference_type,
         $.pointer_type,
         $.approx_type,
         $.variadic_type,
@@ -650,6 +645,8 @@ export default grammar({
       seq("<", optional(commaSep1($.type)), optional(","), ">"),
 
     optional_type: ($) => seq("?", $.type),
+    reference_type: ($) =>
+      seq("&", optional($.mut), field("target", $.type)),
     pointer_type: ($) =>
       seq("^", optional($.const), field("target", $.type)),
     approx_type: ($) => seq("~", $.type),
@@ -677,13 +674,16 @@ export default grammar({
       ),
 
     interface_type: ($) =>
-      seq("interface", "{", optional(commaSep1($.interface_method)), optional(","), "}"),
+      seq($.iface, "{", optional(commaSep1($.interface_method)), optional(","), "}"),
     interface_method: ($) =>
       prec.right(
         seq(
+          "fn",
+          field("receiver", $.receiver),
           field("name", $.identifier),
+          optional(field("type_parameters", $.type_parameter_list)),
           field("parameters", $.parameter_list),
-          optional(seq(":", field("result", $.type))),
+          optional(seq("->", field("result", $.type))),
         ),
       ),
 

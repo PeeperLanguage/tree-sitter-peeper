@@ -224,6 +224,10 @@
         "named": true
       },
       {
+        "type": "reference_type",
+        "named": true
+      },
+      {
         "type": "slice_type",
         "named": true
       },
@@ -1069,6 +1073,16 @@
           }
         ]
       },
+      "receiver": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "receiver",
+            "named": true
+          }
+        ]
+      },
       "result": {
         "multiple": false,
         "required": false,
@@ -1244,32 +1258,6 @@
     }
   },
   {
-    "type": "impl_declaration",
-    "named": true,
-    "fields": {
-      "target": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "type",
-            "named": true
-          }
-        ]
-      }
-    },
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "function_declaration",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "import_declaration",
     "named": true,
     "fields": {
@@ -1356,8 +1344,12 @@
     },
     "children": {
       "multiple": true,
-      "required": false,
+      "required": true,
       "types": [
+        {
+          "type": "iface",
+          "named": true
+        },
         {
           "type": "interface_method",
           "named": true
@@ -1389,12 +1381,32 @@
           }
         ]
       },
+      "receiver": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "receiver",
+            "named": true
+          }
+        ]
+      },
       "result": {
         "multiple": false,
         "required": false,
         "types": [
           {
             "type": "type",
+            "named": true
+          }
+        ]
+      },
+      "type_parameters": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "type_parameter_list",
             "named": true
           }
         ]
@@ -1407,8 +1419,12 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": false,
+      "required": true,
       "types": [
+        {
+          "type": "iface",
+          "named": true
+        },
         {
           "type": "interface_method",
           "named": true
@@ -1973,6 +1989,48 @@
     }
   },
   {
+    "type": "receiver",
+    "named": true,
+    "fields": {
+      "parameter": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "typed_parameter",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "reference_type",
+    "named": true,
+    "fields": {
+      "target": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "type",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "mut",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "return_statement",
     "named": true,
     "fields": {
@@ -2191,10 +2249,6 @@
         },
         {
           "type": "function_declaration",
-          "named": true
-        },
-        {
-          "type": "impl_declaration",
           "named": true
         },
         {
@@ -2452,6 +2506,10 @@
     "named": false
   },
   {
+    "type": "&",
+    "named": false
+  },
+  {
     "type": "&&",
     "named": false
   },
@@ -2674,8 +2732,8 @@
     "named": false
   },
   {
-    "type": "impl",
-    "named": false
+    "type": "iface",
+    "named": true
   },
   {
     "type": "import",
@@ -2684,10 +2742,6 @@
   {
     "type": "in",
     "named": true
-  },
-  {
-    "type": "interface",
-    "named": false
   },
   {
     "type": "is",

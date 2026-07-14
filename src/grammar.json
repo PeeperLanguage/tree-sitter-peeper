@@ -42,6 +42,10 @@
       "type": "STRING",
       "value": "self"
     },
+    "iface": {
+      "type": "STRING",
+      "value": "iface"
+    },
     "top_level_item": {
       "type": "CHOICE",
       "members": [
@@ -152,10 +156,6 @@
               "name": "enum_declaration"
             }
           ]
-        },
-        {
-          "type": "SYMBOL",
-          "name": "impl_declaration"
         },
         {
           "type": "SYMBOL",
@@ -508,8 +508,8 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "STRING",
-          "value": "interface"
+          "type": "SYMBOL",
+          "name": "iface"
         },
         {
           "type": "FIELD",
@@ -700,50 +700,6 @@
         }
       ]
     },
-    "impl_declaration": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "STRING",
-          "value": "impl"
-        },
-        {
-          "type": "FIELD",
-          "name": "target",
-          "content": {
-            "type": "SYMBOL",
-            "name": "type"
-          }
-        },
-        {
-          "type": "STRING",
-          "value": "{"
-        },
-        {
-          "type": "REPEAT",
-          "content": {
-            "type": "SYMBOL",
-            "name": "function_declaration"
-          }
-        },
-        {
-          "type": "STRING",
-          "value": "}"
-        },
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "STRING",
-              "value": ";"
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
-        }
-      ]
-    },
     "attribute": {
       "type": "SEQ",
       "members": [
@@ -900,6 +856,22 @@
           "value": "fn"
         },
         {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "FIELD",
+              "name": "receiver",
+              "content": {
+                "type": "SYMBOL",
+                "name": "receiver"
+              }
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
           "type": "FIELD",
           "name": "name",
           "content": {
@@ -972,6 +944,27 @@
               "value": ";"
             }
           ]
+        }
+      ]
+    },
+    "receiver": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "("
+        },
+        {
+          "type": "FIELD",
+          "name": "parameter",
+          "content": {
+            "type": "SYMBOL",
+            "name": "typed_parameter"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": ")"
         }
       ]
     },
@@ -3331,6 +3324,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "reference_type"
+        },
+        {
+          "type": "SYMBOL",
           "name": "pointer_type"
         },
         {
@@ -3607,6 +3604,35 @@
         {
           "type": "SYMBOL",
           "name": "type"
+        }
+      ]
+    },
+    "reference_type": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "&"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "mut"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "FIELD",
+          "name": "target",
+          "content": {
+            "type": "SYMBOL",
+            "name": "type"
+          }
         }
       ]
     },
@@ -3935,8 +3961,8 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "STRING",
-          "value": "interface"
+          "type": "SYMBOL",
+          "name": "iface"
         },
         {
           "type": "STRING",
@@ -4000,12 +4026,40 @@
         "type": "SEQ",
         "members": [
           {
+            "type": "STRING",
+            "value": "fn"
+          },
+          {
+            "type": "FIELD",
+            "name": "receiver",
+            "content": {
+              "type": "SYMBOL",
+              "name": "receiver"
+            }
+          },
+          {
             "type": "FIELD",
             "name": "name",
             "content": {
               "type": "SYMBOL",
               "name": "identifier"
             }
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "FIELD",
+                "name": "type_parameters",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "type_parameter_list"
+                }
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
           },
           {
             "type": "FIELD",
@@ -4023,7 +4077,7 @@
                 "members": [
                   {
                     "type": "STRING",
-                    "value": ":"
+                    "value": "->"
                   },
                   {
                     "type": "FIELD",
