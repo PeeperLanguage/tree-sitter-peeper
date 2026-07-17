@@ -87,6 +87,7 @@ export default grammar({
     mut: () => "mut",
     self: () => "self",
     iface: () => "iface",
+    from: () => "from",
 
     top_level_item: ($) =>
       choice(
@@ -202,6 +203,7 @@ export default grammar({
         optional(field("type_parameters", $.type_parameter_list)),
         field("parameters", $.parameter_list),
         optional(seq("->", field("result", $.type))),
+        optional(field("return_origins", $.return_origin_clause)),
         choice(field("body", $.block), ";"),
       ),
 
@@ -629,17 +631,41 @@ export default grammar({
       ),
 
     function_type: ($) =>
-      seq(
-        "fn",
-        "(",
-        optional(commaSep1($.function_type_parameter)),
-        optional(","),
-        ")",
-        optional(seq("->", field("result", $.type))),
+      prec.right(
+        seq(
+          "fn",
+          "(",
+          optional(commaSep1($.function_type_parameter)),
+          optional(","),
+          ")",
+          optional(seq("->", field("result", $.type))),
+          optional(field("return_origins", $.return_origin_clause)),
+        ),
       ),
 
     function_type_parameter: ($) =>
-      seq(field("type", choice($.variadic_type, $.type))),
+      choice(
+        seq(
+          field("name", $.identifier),
+          ":",
+          field("type", choice($.variadic_type, $.type)),
+        ),
+        field("type", choice($.variadic_type, $.type)),
+      ),
+
+    return_origin_clause: ($) =>
+      seq(
+        $.from,
+        choice(
+          field("source", $.identifier),
+          seq(
+            "(",
+            commaSep1(field("source", $.identifier)),
+            optional(","),
+            ")",
+          ),
+        ),
+      ),
 
     type_argument_list: ($) =>
       seq("<", optional(commaSep1($.type)), optional(","), ">"),
@@ -684,6 +710,7 @@ export default grammar({
           optional(field("type_parameters", $.type_parameter_list)),
           field("parameters", $.parameter_list),
           optional(seq("->", field("result", $.type))),
+          optional(field("return_origins", $.return_origin_clause)),
         ),
       ),
 
