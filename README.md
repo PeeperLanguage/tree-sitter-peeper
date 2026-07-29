@@ -15,7 +15,7 @@ This grammar targets the new Peeper syntax in this repo, not the older Peeper co
 - `let` / `let mut`
 - `if` / `else`
 - `match`
-- `^T` pointer types and `?T` optionals
+- `*T` owned pointer types, `rawptr`, and `?T` optionals
 - array literals and indexing
 - postfix `++` / `--`
 - struct literals: `.{ x = 1, y = 2 }`

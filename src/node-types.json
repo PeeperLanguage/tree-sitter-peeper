@@ -220,7 +220,11 @@
         "named": true
       },
       {
-        "type": "pointer_type",
+        "type": "owned_pointer_type",
+        "named": true
+      },
+      {
+        "type": "raw_pointer_type",
         "named": true
       },
       {
@@ -1832,6 +1836,22 @@
     }
   },
   {
+    "type": "owned_pointer_type",
+    "named": true,
+    "fields": {
+      "target": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "type",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "panic_statement",
     "named": true,
     "fields": {
@@ -1887,32 +1907,6 @@
       "types": [
         {
           "type": "expression",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "pointer_type",
-    "named": true,
-    "fields": {
-      "target": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "type",
-            "named": true
-          }
-        ]
-      }
-    },
-    "children": {
-      "multiple": false,
-      "required": false,
-      "types": [
-        {
-          "type": "const",
           "named": true
         }
       ]
@@ -2712,10 +2706,6 @@
     "named": false
   },
   {
-    "type": "^",
-    "named": false
-  },
-  {
     "type": "_",
     "named": false
   },
@@ -2853,6 +2843,10 @@
   {
     "type": "panic",
     "named": false
+  },
+  {
+    "type": "raw_pointer_type",
+    "named": true
   },
   {
     "type": "return",

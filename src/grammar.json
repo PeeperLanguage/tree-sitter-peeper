@@ -3348,7 +3348,11 @@
         },
         {
           "type": "SYMBOL",
-          "name": "pointer_type"
+          "name": "owned_pointer_type"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "raw_pointer_type"
         },
         {
           "type": "SYMBOL",
@@ -3790,24 +3794,12 @@
         }
       ]
     },
-    "pointer_type": {
+    "owned_pointer_type": {
       "type": "SEQ",
       "members": [
         {
           "type": "STRING",
-          "value": "^"
-        },
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "const"
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
+          "value": "*"
         },
         {
           "type": "FIELD",
@@ -3818,6 +3810,10 @@
           }
         }
       ]
+    },
+    "raw_pointer_type": {
+      "type": "STRING",
+      "value": "rawptr"
     },
     "approx_type": {
       "type": "SEQ",

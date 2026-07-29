@@ -607,7 +607,8 @@ export default grammar({
         $.function_type,
         $.optional_type,
         $.reference_type,
-        $.pointer_type,
+        $.owned_pointer_type,
+        $.raw_pointer_type,
         $.approx_type,
         $.variadic_type,
         $.slice_type,
@@ -673,8 +674,8 @@ export default grammar({
     optional_type: ($) => seq("?", $.type),
     reference_type: ($) =>
       seq("&", optional($.mut), field("target", $.type)),
-    pointer_type: ($) =>
-      seq("^", optional($.const), field("target", $.type)),
+    owned_pointer_type: ($) => seq("*", field("target", $.type)),
+    raw_pointer_type: () => "rawptr",
     approx_type: ($) => seq("~", $.type),
     variadic_type: ($) => seq("...", $.type),
     slice_type: ($) => seq("[", "]", field("element", $.type)),
