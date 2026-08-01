@@ -3356,6 +3356,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "str_type"
+        },
+        {
+          "type": "SYMBOL",
           "name": "approx_type"
         },
         {
@@ -3814,6 +3818,10 @@
     "raw_pointer_type": {
       "type": "STRING",
       "value": "rawptr"
+    },
+    "str_type": {
+      "type": "STRING",
+      "value": "str"
     },
     "approx_type": {
       "type": "SEQ",

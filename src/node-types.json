@@ -236,6 +236,10 @@
         "named": true
       },
       {
+        "type": "str_type",
+        "named": true
+      },
+      {
         "type": "struct_type",
         "named": true
       },
@@ -2851,6 +2855,10 @@
   {
     "type": "return",
     "named": false
+  },
+  {
+    "type": "str_type",
+    "named": true
   },
   {
     "type": "string_literal",
