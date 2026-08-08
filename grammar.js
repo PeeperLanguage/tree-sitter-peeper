@@ -403,6 +403,7 @@ export default grammar({
         $.scoped_identifier,
         $.number_literal,
         $.string_literal,
+        $.c_string_literal,
         $.char_literal,
         $.byte_literal,
         $.boolean_literal,
@@ -743,6 +744,7 @@ export default grammar({
         choice(HEX_NUMBER, OCT_NUMBER, BIN_NUMBER, DEC_NUMBER, IMAG_NUMBER, FLOAT_NUMBER),
       ),
     string_literal: ($) => token(/"(?:\\.|[^"\\\n])*"/),
+    c_string_literal: ($) => token(/c"(?:\\.|[^"\\\n])*"/),
     char_literal: ($) => token(/'(?:\\.|[^'\\\n])+'/),
     byte_literal: ($) => token(/b'(?:\\.|[^'\\\n])+'/),
 
