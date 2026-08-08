@@ -2183,6 +2183,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "c_string_literal"
+        },
+        {
+          "type": "SYMBOL",
           "name": "char_literal"
         },
         {
@@ -4553,6 +4557,13 @@
       "content": {
         "type": "PATTERN",
         "value": "\"(?:\\\\.|[^\"\\\\\\n])*\""
+      }
+    },
+    "c_string_literal": {
+      "type": "TOKEN",
+      "content": {
+        "type": "PATTERN",
+        "value": "c\"(?:\\\\.|[^\"\\\\\\n])*\""
       }
     },
     "char_literal": {

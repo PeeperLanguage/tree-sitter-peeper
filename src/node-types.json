@@ -20,6 +20,10 @@
         "named": true
       },
       {
+        "type": "c_string_literal",
+        "named": true
+      },
+      {
         "type": "call_expression",
         "named": true
       },
@@ -2728,6 +2732,10 @@
   },
   {
     "type": "byte_literal",
+    "named": true
+  },
+  {
+    "type": "c_string_literal",
     "named": true
   },
   {
