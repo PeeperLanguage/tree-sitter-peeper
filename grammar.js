@@ -1,5 +1,6 @@
 const PREC = {
   catch: 1,
+  pipe: 1,
   coalesce: 2,
   or: 3,
   and: 4,
@@ -552,6 +553,10 @@ export default grammar({
 
     binary_expression: ($) =>
       choice(
+        prec.left(
+          PREC.pipe,
+          seq(field("left", $.expression), "|>", field("right", $.expression)),
+        ),
         prec.left(
           PREC.coalesce,
           seq(field("left", $.expression), "??", field("right", $.expression)),
