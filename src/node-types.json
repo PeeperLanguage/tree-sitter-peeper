@@ -56,11 +56,11 @@
         "named": true
       },
       {
-        "type": "lambda_expression",
+        "type": "is_expression",
         "named": true
       },
       {
-        "type": "match_expression",
+        "type": "lambda_expression",
         "named": true
       },
       {
@@ -105,6 +105,10 @@
       },
       {
         "type": "struct_literal",
+        "named": true
+      },
+      {
+        "type": "variant_literal",
         "named": true
       }
     ]
@@ -155,6 +159,10 @@
       },
       {
         "type": "let_statement",
+        "named": true
+      },
+      {
+        "type": "match_statement",
         "named": true
       },
       {
@@ -483,23 +491,9 @@
           {
             "type": "expression",
             "named": true
-          },
-          {
-            "type": "type",
-            "named": true
           }
         ]
       }
-    },
-    "children": {
-      "multiple": false,
-      "required": false,
-      "types": [
-        {
-          "type": "is",
-          "named": true
-        }
-      ]
     }
   },
   {
@@ -840,7 +834,7 @@
       "required": false,
       "types": [
         {
-          "type": "identifier",
+          "type": "enum_variant",
           "named": true
         }
       ]
@@ -855,7 +849,48 @@
       "required": false,
       "types": [
         {
-          "type": "identifier",
+          "type": "enum_variant",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "enum_variant",
+    "named": true,
+    "fields": {
+      "data": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "enum_variant_data",
+            "named": true
+          }
+        ]
+      },
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "enum_variant_data",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "field_declaration",
           "named": true
         }
       ]
@@ -1485,6 +1520,42 @@
     }
   },
   {
+    "type": "is_expression",
+    "named": true,
+    "fields": {
+      "case": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "variant_case",
+            "named": true
+          }
+        ]
+      },
+      "value": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "is",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "labeled_statement",
     "named": true,
     "fields": {
@@ -1708,10 +1779,6 @@
           {
             "type": "block",
             "named": true
-          },
-          {
-            "type": "expression",
-            "named": true
           }
         ]
       },
@@ -1720,7 +1787,7 @@
         "required": true,
         "types": [
           {
-            "type": "match_pattern",
+            "type": "variant_pattern",
             "named": true
           }
         ]
@@ -1728,7 +1795,7 @@
     }
   },
   {
-    "type": "match_expression",
+    "type": "match_statement",
     "named": true,
     "fields": {
       "value": {
@@ -1748,36 +1815,6 @@
       "types": [
         {
           "type": "match_arm",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "match_pattern",
-    "named": true,
-    "fields": {
-      "type": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "type",
-            "named": true
-          }
-        ]
-      }
-    },
-    "children": {
-      "multiple": false,
-      "required": false,
-      "types": [
-        {
-          "type": "expression",
-          "named": true
-        },
-        {
-          "type": "is",
           "named": true
         }
       ]
@@ -2544,6 +2581,140 @@
       "types": [
         {
           "type": "type",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "variant_case",
+    "named": true,
+    "fields": {
+      "path": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "scoped_identifier",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "variant_initializer_fields",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "named_field_initializer",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "variant_literal",
+    "named": true,
+    "fields": {
+      "case": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "variant_case",
+            "named": true
+          }
+        ]
+      },
+      "fields": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "variant_initializer_fields",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "variant_pattern",
+    "named": true,
+    "fields": {
+      "case": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "variant_case",
+            "named": true
+          }
+        ]
+      },
+      "fields": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "variant_pattern_fields",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "variant_pattern_field",
+    "named": true,
+    "fields": {
+      "binding": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "discard": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "_",
+            "named": false
+          }
+        ]
+      },
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "variant_pattern_fields",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "variant_pattern_field",
           "named": true
         }
       ]

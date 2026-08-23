@@ -8,13 +8,14 @@ This grammar targets the new Peeper syntax in this repo, not the older Peeper co
 
 - imports
 - top-level `let` / `const`
-- `struct`, `interface`, and `enum` declarations
+- `struct`, `interface`, and payload-aware `enum` declarations
 - `impl T { ... }`
 - plain function declarations
 - generic type/function syntax with `<T>`
 - `let` / `let mut`
 - `if` / `else`
-- `match`
+- fully named enum construction and `is` case tests
+- statement `match` with named field bindings
 - `*T` owned pointer types, `rawptr`, and `?T` optionals
 - array literals and indexing
 - postfix `++` / `--`

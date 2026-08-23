@@ -74,6 +74,8 @@ export default grammar({
     [$.named_type, $.generic_type],
     [$.generic_call_expression, $.binary_expression],
     [$.generic_call_expression, $.prefix_expression, $.binary_expression],
+    [$.expression, $.variant_case],
+    [$.generic_type, $.variant_case],
   ],
 
   rules: {
@@ -165,11 +167,20 @@ export default grammar({
         field("name", $.identifier),
         optional(field("type_parameters", $.type_parameter_list)),
         "{",
-        optional(commaSep1($.identifier)),
+        optional(commaSep1($.enum_variant)),
         optional(","),
         "}",
         optional(";"),
       ),
+
+    enum_variant: ($) =>
+      seq(
+        field("name", $.identifier),
+        optional(seq(":", field("data", $.enum_variant_data))),
+      ),
+
+    enum_variant_data: ($) =>
+      seq("{", commaSep1($.field_declaration), optional(","), "}"),
 
     attribute: ($) =>
       seq(
@@ -256,6 +267,7 @@ export default grammar({
         $.return_statement,
         $.if_statement,
         $.for_statement,
+        $.match_statement,
         $.defer_statement,
         $.panic_statement,
         $.unsafe_statement,
@@ -306,18 +318,36 @@ export default grammar({
         ),
       ),
 
-    match_expression: ($) =>
+    match_statement: ($) =>
       seq("match", field("value", $.expression), "{", repeat($.match_arm), "}"),
 
     match_arm: ($) =>
       seq(
-        field("pattern", $.match_pattern),
+        field("pattern", $.variant_pattern),
         "=>",
-        field("body", choice($.block, $.expression)),
+        field("body", $.block),
       ),
 
-    match_pattern: ($) =>
-      choice("_", seq($.is, field("type", $.type)), $.expression),
+    variant_pattern: ($) =>
+      seq(
+        field("case", $.variant_case),
+        optional(field("fields", $.variant_pattern_fields)),
+      ),
+
+    variant_pattern_fields: ($) =>
+      seq(
+        "{",
+        optional(commaSep1($.variant_pattern_field)),
+        optional(","),
+        "}",
+      ),
+
+    variant_pattern_field: ($) =>
+      seq(
+        field("name", $.identifier),
+        "=",
+        choice(field("binding", $.identifier), field("discard", "_")),
+      ),
 
     for_statement: ($) =>
       seq(
@@ -383,10 +413,10 @@ export default grammar({
 
     expression: ($) =>
       choice(
-        $.match_expression,
         $.catch_expression,
         $.lambda_expression,
         $.range_expression,
+        $.is_expression,
         $.binary_expression,
         $.prefix_expression,
         $.postfix_expression,
@@ -400,6 +430,7 @@ export default grammar({
         $.parenthesized_expression,
         $.array_literal,
         $.struct_literal,
+        $.variant_literal,
         $.identifier,
         $.scoped_identifier,
         $.number_literal,
@@ -436,6 +467,23 @@ export default grammar({
     struct_literal: ($) =>
       seq(
         ".",
+        "{",
+        optional(commaSep1($.named_field_initializer)),
+        optional(","),
+        "}",
+      ),
+
+    variant_literal: ($) =>
+      prec(
+        PREC.postfix,
+        seq(
+          field("case", $.variant_case),
+          field("fields", $.variant_initializer_fields),
+        ),
+      ),
+
+    variant_initializer_fields: ($) =>
+      seq(
         "{",
         optional(commaSep1($.named_field_initializer)),
         optional(","),
@@ -551,6 +599,16 @@ export default grammar({
         ),
       ),
 
+    is_expression: ($) =>
+      prec.left(
+        PREC.equality,
+        seq(
+          field("value", $.expression),
+          $.is,
+          field("case", $.variant_case),
+        ),
+      ),
+
     binary_expression: ($) =>
       choice(
         prec.left(
@@ -576,10 +634,6 @@ export default grammar({
             choice("==", "!="),
             field("right", $.expression),
           ),
-        ),
-        prec.left(
-          PREC.comparison,
-          seq(field("left", $.expression), $.is, field("right", $.type)),
         ),
         prec.left(
           PREC.comparison,
@@ -724,7 +778,7 @@ export default grammar({
       ),
 
     enum_type: ($) =>
-      seq("enum", "{", optional(commaSep1($.identifier)), optional(","), "}"),
+      seq("enum", "{", optional(commaSep1($.enum_variant)), optional(","), "}"),
     union_type: ($) =>
       seq("union", "{", optional(commaSep1($.type)), optional(","), "}"),
     error_type: ($) =>
@@ -741,6 +795,8 @@ export default grammar({
           field("name", $.identifier),
         ),
       ),
+
+    variant_case: ($) => field("path", $.scoped_identifier),
 
     boolean_literal: ($) => choice("true", "false"),
     none_literal: ($) => "none",

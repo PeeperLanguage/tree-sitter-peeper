@@ -1,0 +1,201 @@
+==================
+Enum data variants
+==================
+
+enum Result<T> {
+    Ok: {
+        value: T,
+    },
+    Error: {
+        message: str,
+    },
+    Pending,
+}
+
+---
+
+(source_file
+  (top_level_item
+    (enum_declaration
+      (identifier)
+      (type_parameter_list
+        (type_parameter
+          (identifier)))
+      (enum_variant
+        (identifier)
+        (enum_variant_data
+          (field_declaration
+            (identifier)
+            (named_type
+              (identifier)))))
+      (enum_variant
+        (identifier)
+        (enum_variant_data
+          (field_declaration
+            (identifier)
+            (str_type))))
+      (enum_variant
+        (identifier)))))
+
+========================
+Construction and is test
+========================
+
+fn inspect(result: Result<i32>) {
+    let ok = Result<i32>::Ok{
+        value = 42,
+    };
+    let pending = Result<i32>::Pending;
+    if result is Result<i32>::Ok {
+        return;
+    }
+}
+
+---
+
+(source_file
+  (top_level_item
+    (function_declaration
+      (identifier)
+      (parameter_list
+        (parameter
+          (typed_parameter
+            (identifier)
+            (generic_type
+              (identifier)
+              (type_argument_list
+                (named_type
+                  (identifier)))))))
+      (block
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (variant_literal
+              (variant_case
+                (scoped_identifier
+                  (generic_type
+                    (identifier)
+                    (type_argument_list
+                      (named_type
+                        (identifier))))
+                  (identifier)))
+              (variant_initializer_fields
+                (named_field_initializer
+                  (identifier)
+                  (number_literal))))))
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (scoped_identifier
+              (generic_type
+                (identifier)
+                (type_argument_list
+                  (named_type
+                    (identifier))))
+              (identifier))))
+        (if_statement
+          (is_expression
+            (identifier)
+            (is)
+            (variant_case
+              (scoped_identifier
+                (generic_type
+                  (identifier)
+                  (type_argument_list
+                    (named_type
+                      (identifier))))
+                (identifier))))
+          (block
+            (return_statement)))))))
+
+===============
+Statement match
+===============
+
+fn inspect(result: Result<i32>) {
+    match result {
+        Result<i32>::Ok{ value = payload } => {
+            use(payload);
+        }
+        Result<i32>::Error{ message = _ } => {
+            report();
+        }
+        Result<i32>::Pending => {
+            wait();
+        }
+    }
+}
+
+---
+
+(source_file
+  (top_level_item
+    (function_declaration
+      (identifier)
+      (parameter_list
+        (parameter
+          (typed_parameter
+            (identifier)
+            (generic_type
+              (identifier)
+              (type_argument_list
+                (named_type
+                  (identifier)))))))
+      (block
+        (match_statement
+          (identifier)
+          (match_arm
+            (variant_pattern
+              (variant_case
+                (scoped_identifier
+                  (generic_type
+                    (identifier)
+                    (type_argument_list
+                      (named_type
+                        (identifier))))
+                  (identifier)))
+              (variant_pattern_fields
+                (variant_pattern_field
+                  (identifier)
+                  (identifier))))
+            (block
+              (expression_statement
+                (call_expression
+                  (identifier)
+                  (argument_list
+                    (identifier))))))
+          (match_arm
+            (variant_pattern
+              (variant_case
+                (scoped_identifier
+                  (generic_type
+                    (identifier)
+                    (type_argument_list
+                      (named_type
+                        (identifier))))
+                  (identifier)))
+              (variant_pattern_fields
+                (variant_pattern_field
+                  (identifier))))
+            (block
+              (expression_statement
+                (call_expression
+                  (identifier)
+                  (argument_list)))))
+          (match_arm
+            (variant_pattern
+              (variant_case
+                (scoped_identifier
+                  (generic_type
+                    (identifier)
+                    (type_argument_list
+                      (named_type
+                        (identifier))))
+                  (identifier))))
+            (block
+              (expression_statement
+                (call_expression
+                  (identifier)
+                  (argument_list))))))))))
