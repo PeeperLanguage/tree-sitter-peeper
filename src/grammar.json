@@ -18,6 +18,10 @@
       "type": "STRING",
       "value": "is"
     },
+    "with": {
+      "type": "STRING",
+      "value": "with"
+    },
     "in": {
       "type": "STRING",
       "value": "in"
@@ -727,10 +731,19 @@
                 },
                 {
                   "type": "FIELD",
-                  "name": "data",
+                  "name": "payload",
                   "content": {
-                    "type": "SYMBOL",
-                    "name": "enum_variant_data"
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "SYMBOL",
+                        "name": "type"
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "enum_variant_struct_type"
+                      }
+                    ]
                   }
                 }
               ]
@@ -742,7 +755,7 @@
         }
       ]
     },
-    "enum_variant_data": {
+    "enum_variant_struct_type": {
       "type": "SEQ",
       "members": [
         {
@@ -1799,12 +1812,34 @@
           "type": "CHOICE",
           "members": [
             {
-              "type": "FIELD",
-              "name": "fields",
-              "content": {
-                "type": "SYMBOL",
-                "name": "variant_pattern_fields"
-              }
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "with"
+                },
+                {
+                  "type": "FIELD",
+                  "name": "payload",
+                  "content": {
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "SYMBOL",
+                        "name": "variant_pattern_fields"
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "identifier"
+                      },
+                      {
+                        "type": "STRING",
+                        "value": "_"
+                      }
+                    ]
+                  }
+                }
+              ]
             },
             {
               "type": "BLANK"
@@ -2674,8 +2709,8 @@
       ]
     },
     "variant_literal": {
-      "type": "PREC",
-      "value": 10,
+      "type": "PREC_RIGHT",
+      "value": 1,
       "content": {
         "type": "SEQ",
         "members": [
@@ -2688,73 +2723,19 @@
             }
           },
           {
+            "type": "SYMBOL",
+            "name": "with"
+          },
+          {
             "type": "FIELD",
-            "name": "fields",
+            "name": "payload",
             "content": {
               "type": "SYMBOL",
-              "name": "variant_initializer_fields"
+              "name": "expression"
             }
           }
         ]
       }
-    },
-    "variant_initializer_fields": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "STRING",
-          "value": "{"
-        },
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "SYMBOL",
-                  "name": "named_field_initializer"
-                },
-                {
-                  "type": "REPEAT",
-                  "content": {
-                    "type": "SEQ",
-                    "members": [
-                      {
-                        "type": "STRING",
-                        "value": ","
-                      },
-                      {
-                        "type": "SYMBOL",
-                        "name": "named_field_initializer"
-                      }
-                    ]
-                  }
-                }
-              ]
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
-        },
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "STRING",
-              "value": ","
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
-        },
-        {
-          "type": "STRING",
-          "value": "}"
-        }
-      ]
     },
     "named_field_initializer": {
       "type": "SEQ",
@@ -4980,10 +4961,6 @@
       "generic_call_expression",
       "prefix_expression",
       "binary_expression"
-    ],
-    [
-      "expression",
-      "variant_case"
     ],
     [
       "generic_type",

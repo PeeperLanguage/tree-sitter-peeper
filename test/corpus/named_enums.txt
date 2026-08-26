@@ -9,6 +9,7 @@ enum Result<T> {
     Error: {
         message: str,
     },
+    Failed: str,
     Pending,
 }
 
@@ -23,17 +24,20 @@ enum Result<T> {
           (identifier)))
       (enum_variant
         (identifier)
-        (enum_variant_data
+        (enum_variant_struct_type
           (field_declaration
             (identifier)
             (named_type
               (identifier)))))
       (enum_variant
         (identifier)
-        (enum_variant_data
+        (enum_variant_struct_type
           (field_declaration
             (identifier)
             (str_type))))
+      (enum_variant
+        (identifier)
+        (str_type))
       (enum_variant
         (identifier)))))
 
@@ -42,9 +46,10 @@ Construction and is test
 ========================
 
 fn inspect(result: Result<i32>) {
-    let ok = Result<i32>::Ok{
+    let ok = Result<i32>::Ok with .{
         value = 42,
     };
+    let failed = Result<i32>::Failed with "not found";
     let pending = Result<i32>::Pending;
     if result is Result<i32>::Ok {
         return;
@@ -80,10 +85,26 @@ fn inspect(result: Result<i32>) {
                       (named_type
                         (identifier))))
                   (identifier)))
-              (variant_initializer_fields
+              (with)
+              (struct_literal
                 (named_field_initializer
                   (identifier)
                   (number_literal))))))
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (variant_literal
+              (variant_case
+                (scoped_identifier
+                  (generic_type
+                    (identifier)
+                    (type_argument_list
+                      (named_type
+                        (identifier))))
+                  (identifier)))
+              (with)
+              (string_literal))))
         (let_statement
           (let_clause
             (let)
@@ -116,10 +137,10 @@ Statement match
 
 fn inspect(result: Result<i32>) {
     match result {
-        Result<i32>::Ok{ value = payload } => {
+        Result<i32>::Ok with { value = payload } => {
             use(payload);
         }
-        Result<i32>::Error{ message = _ } => {
+        Result<i32>::Error with { message = _ } => {
             report();
         }
         Result<i32>::Pending => {
@@ -156,6 +177,7 @@ fn inspect(result: Result<i32>) {
                       (named_type
                         (identifier))))
                   (identifier)))
+              (with)
               (variant_pattern_fields
                 (variant_pattern_field
                   (identifier)
@@ -176,6 +198,7 @@ fn inspect(result: Result<i32>) {
                       (named_type
                         (identifier))))
                   (identifier)))
+              (with)
               (variant_pattern_fields
                 (variant_pattern_field
                   (identifier))))

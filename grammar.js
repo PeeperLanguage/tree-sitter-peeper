@@ -74,7 +74,6 @@ export default grammar({
     [$.named_type, $.generic_type],
     [$.generic_call_expression, $.binary_expression],
     [$.generic_call_expression, $.prefix_expression, $.binary_expression],
-    [$.expression, $.variant_case],
     [$.generic_type, $.variant_case],
   ],
 
@@ -83,6 +82,7 @@ export default grammar({
 
     let: () => "let",
     is: () => "is",
+    with: () => "with",
     in: () => "in",
     move: () => "move",
     comptime: () => "comptime",
@@ -176,10 +176,10 @@ export default grammar({
     enum_variant: ($) =>
       seq(
         field("name", $.identifier),
-        optional(seq(":", field("data", $.enum_variant_data))),
+        optional(seq(":", field("payload", choice($.type, $.enum_variant_struct_type)))),
       ),
 
-    enum_variant_data: ($) =>
+    enum_variant_struct_type: ($) =>
       seq("{", commaSep1($.field_declaration), optional(","), "}"),
 
     attribute: ($) =>
@@ -331,7 +331,15 @@ export default grammar({
     variant_pattern: ($) =>
       seq(
         field("case", $.variant_case),
-        optional(field("fields", $.variant_pattern_fields)),
+        optional(
+          seq(
+            $.with,
+            field(
+              "payload",
+              choice($.variant_pattern_fields, $.identifier, "_"),
+            ),
+          ),
+        ),
       ),
 
     variant_pattern_fields: ($) =>
@@ -474,20 +482,13 @@ export default grammar({
       ),
 
     variant_literal: ($) =>
-      prec(
-        PREC.postfix,
+      prec.right(
+        PREC.catch,
         seq(
           field("case", $.variant_case),
-          field("fields", $.variant_initializer_fields),
+          $.with,
+          field("payload", $.expression),
         ),
-      ),
-
-    variant_initializer_fields: ($) =>
-      seq(
-        "{",
-        optional(commaSep1($.named_field_initializer)),
-        optional(","),
-        "}",
       ),
 
     named_field_initializer: ($) =>

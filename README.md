@@ -14,8 +14,8 @@ This grammar targets the new Peeper syntax in this repo, not the older Peeper co
 - generic type/function syntax with `<T>`
 - `let` / `let mut`
 - `if` / `else`
-- fully named enum construction and `is` case tests
-- statement `match` with named field bindings
+- fully named `Enum::Variant with expression` construction and `is` case tests
+- statement `match` with whole-payload bindings or struct field patterns
 - `*T` owned pointer types, `rawptr`, and `?T` optionals
 - array literals and indexing
 - postfix `++` / `--`
