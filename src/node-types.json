@@ -859,16 +859,6 @@
     "type": "enum_variant",
     "named": true,
     "fields": {
-      "data": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "enum_variant_data",
-            "named": true
-          }
-        ]
-      },
       "name": {
         "multiple": false,
         "required": true,
@@ -878,11 +868,25 @@
             "named": true
           }
         ]
+      },
+      "payload": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "enum_variant_struct_type",
+            "named": true
+          },
+          {
+            "type": "type",
+            "named": true
+          }
+        ]
       }
     }
   },
   {
-    "type": "enum_variant_data",
+    "type": "enum_variant_struct_type",
     "named": true,
     "fields": {},
     "children": {
@@ -2603,21 +2607,6 @@
     }
   },
   {
-    "type": "variant_initializer_fields",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "named_field_initializer",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "variant_literal",
     "named": true,
     "fields": {
@@ -2631,16 +2620,26 @@
           }
         ]
       },
-      "fields": {
+      "payload": {
         "multiple": false,
         "required": true,
         "types": [
           {
-            "type": "variant_initializer_fields",
+            "type": "expression",
             "named": true
           }
         ]
       }
+    },
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "with",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -2657,16 +2656,34 @@
           }
         ]
       },
-      "fields": {
+      "payload": {
         "multiple": false,
         "required": false,
         "types": [
+          {
+            "type": "_",
+            "named": false
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
           {
             "type": "variant_pattern_fields",
             "named": true
           }
         ]
       }
+    },
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "with",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -3062,6 +3079,10 @@
   {
     "type": "unsafe",
     "named": false
+  },
+  {
+    "type": "with",
+    "named": true
   },
   {
     "type": "{",
