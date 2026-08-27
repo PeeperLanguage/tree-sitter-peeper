@@ -1532,7 +1532,7 @@
         "required": true,
         "types": [
           {
-            "type": "variant_case",
+            "type": "expression",
             "named": true
           }
         ]

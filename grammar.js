@@ -74,7 +74,6 @@ export default grammar({
     [$.named_type, $.generic_type],
     [$.generic_call_expression, $.binary_expression],
     [$.generic_call_expression, $.prefix_expression, $.binary_expression],
-    [$.generic_type, $.variant_case],
   ],
 
   rules: {
@@ -606,7 +605,7 @@ export default grammar({
         seq(
           field("value", $.expression),
           $.is,
-          field("case", $.variant_case),
+          field("case", $.expression),
         ),
       ),
 
