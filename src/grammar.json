@@ -1321,6 +1321,31 @@
                 "type": "SYMBOL",
                 "name": "type"
               }
+            },
+            {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SEQ",
+                  "members": [
+                    {
+                      "type": "STRING",
+                      "value": "="
+                    },
+                    {
+                      "type": "FIELD",
+                      "name": "default",
+                      "content": {
+                        "type": "SYMBOL",
+                        "name": "expression"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "BLANK"
+                }
+              ]
             }
           ]
         },
@@ -3315,7 +3340,7 @@
             "name": "case",
             "content": {
               "type": "SYMBOL",
-              "name": "expression"
+              "name": "variant_case"
             }
           }
         ]
@@ -4961,6 +4986,10 @@
       "generic_call_expression",
       "prefix_expression",
       "binary_expression"
+    ],
+    [
+      "generic_type",
+      "variant_case"
     ]
   ],
   "precedences": [],

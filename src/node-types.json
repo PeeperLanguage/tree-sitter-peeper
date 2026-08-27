@@ -1532,7 +1532,7 @@
         "required": true,
         "types": [
           {
-            "type": "expression",
+            "type": "variant_case",
             "named": true
           }
         ]
@@ -2504,6 +2504,16 @@
     "type": "typed_parameter",
     "named": true,
     "fields": {
+      "default": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      },
       "name": {
         "multiple": false,
         "required": false,
