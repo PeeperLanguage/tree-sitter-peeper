@@ -475,6 +475,7 @@ export default grammar({
 
     struct_literal: ($) =>
       seq(
+        optional(field("type", choice($.named_type, $.generic_type))),
         ".",
         "{",
         optional(commaSep1($.named_field_initializer)),

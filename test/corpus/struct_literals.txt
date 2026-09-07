@@ -1,0 +1,592 @@
+==================
+Named and inferred struct literals
+==================
+
+fn literals() {
+    let empty = Point.{};
+    let point = Point.{ x = 1, y = 2, };
+    let inferred: Point = .{ x = 1, y = 2 };
+    let nested = Box<Point>.{ value = Point.{ x = 3, y = 4 } };
+    let inferred_nested = Box<Point>.{ value = .{ x = 3, y = 4 } };
+    let qualified = geometry::Point.{ x = 5, y = 6 };
+    let deep = pkg::geometry::Point.{};
+    let generic = pkg::Box<Point>.{ value = point };
+    let nested_generic = Box<Box<Point>>.{ value = nested };
+    let generic_scope = Outer<i32>::Inner<Point>.{ value = point };
+    let scoped = Outer<i32>::Inner.{};
+    let field = Point.{ x = 1 }.x;
+    let method = Point.{ x = 1 }.check();
+    consume(Point.{ x = 1 });
+    return Point.{ x = 1 };
+}
+
+---
+
+(source_file
+  (top_level_item
+    (function_declaration
+      (identifier)
+      (parameter_list)
+      (block
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (struct_literal
+              (named_type
+                (identifier)))))
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (struct_literal
+              (named_type
+                (identifier))
+              (named_field_initializer
+                (identifier)
+                (number_literal))
+              (named_field_initializer
+                (identifier)
+                (number_literal)))))
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (named_type
+              (identifier))
+            (struct_literal
+              (named_field_initializer
+                (identifier)
+                (number_literal))
+              (named_field_initializer
+                (identifier)
+                (number_literal)))))
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (struct_literal
+              (generic_type
+                (identifier)
+                (type_argument_list
+                  (named_type
+                    (identifier))))
+              (named_field_initializer
+                (identifier)
+                (struct_literal
+                  (named_type
+                    (identifier))
+                  (named_field_initializer
+                    (identifier)
+                    (number_literal))
+                  (named_field_initializer
+                    (identifier)
+                    (number_literal)))))))
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (struct_literal
+              (generic_type
+                (identifier)
+                (type_argument_list
+                  (named_type
+                    (identifier))))
+              (named_field_initializer
+                (identifier)
+                (struct_literal
+                  (named_field_initializer
+                    (identifier)
+                    (number_literal))
+                  (named_field_initializer
+                    (identifier)
+                    (number_literal)))))))
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (struct_literal
+              (named_type
+                (scoped_identifier
+                  (identifier)
+                  (identifier)))
+              (named_field_initializer
+                (identifier)
+                (number_literal))
+              (named_field_initializer
+                (identifier)
+                (number_literal)))))
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (struct_literal
+              (named_type
+                (scoped_identifier
+                  (scoped_identifier
+                    (identifier)
+                    (identifier))
+                  (identifier))))))
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (struct_literal
+              (generic_type
+                (scoped_identifier
+                  (identifier)
+                  (identifier))
+                (type_argument_list
+                  (named_type
+                    (identifier))))
+              (named_field_initializer
+                (identifier)
+                (identifier)))))
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (struct_literal
+              (generic_type
+                (identifier)
+                (type_argument_list
+                  (generic_type
+                    (identifier)
+                    (type_argument_list
+                      (named_type
+                        (identifier))))))
+              (named_field_initializer
+                (identifier)
+                (identifier)))))
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (struct_literal
+              (generic_type
+                (scoped_identifier
+                  (generic_type
+                    (identifier)
+                    (type_argument_list
+                      (named_type
+                        (identifier))))
+                  (identifier))
+                (type_argument_list
+                  (named_type
+                    (identifier))))
+              (named_field_initializer
+                (identifier)
+                (identifier)))))
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (struct_literal
+              (named_type
+                (scoped_identifier
+                  (generic_type
+                    (identifier)
+                    (type_argument_list
+                      (named_type
+                        (identifier))))
+                  (identifier))))))
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (selector_expression
+              (struct_literal
+                (named_type
+                  (identifier))
+                (named_field_initializer
+                  (identifier)
+                  (number_literal)))
+              (identifier))))
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (call_expression
+              (selector_expression
+                (struct_literal
+                  (named_type
+                    (identifier))
+                  (named_field_initializer
+                    (identifier)
+                    (number_literal)))
+                (identifier))
+              (argument_list))))
+        (expression_statement
+          (call_expression
+            (identifier)
+            (argument_list
+              (struct_literal
+                (named_type
+                  (identifier))
+                (named_field_initializer
+                  (identifier)
+                  (number_literal))))))
+        (return_statement
+          (struct_literal
+            (named_type
+              (identifier))
+            (named_field_initializer
+              (identifier)
+              (number_literal))))))))
+
+==================
+Struct literals in control headers
+==================
+
+fn headers() {
+    if Flag.{ value = true } {}
+    for Flag.{ value = true } {}
+    for item in pkg::Items<i32>.{} {}
+    match Wrapper.{} { Result<i32>::Pending => {} }
+    if .{ value = true } {}
+    let empty: Point = .{};
+    if Point.{ x = 1 }.ready() {}
+    if pkg::Box<i32>.{ value = 1 }.ready() {} else {}
+    for Point.{ x = 1 }.ready() {}
+    for item in pkg::Box<i32>.{ value = 1 }.items() {}
+    match Result<Point>::Ok with Point.{ x = 1 } {
+        Result<Point>::Ok with point => {}
+    }
+    if ready {}
+    for ready {}
+    for item in items {}
+    match result { Result<Point>::Pending => {} }
+}
+
+---
+
+(source_file
+  (top_level_item
+    (function_declaration
+      (identifier)
+      (parameter_list)
+      (block
+        (if_statement
+          (struct_literal
+            (named_type
+              (identifier))
+            (named_field_initializer
+              (identifier)
+              (boolean_literal)))
+          (block))
+        (for_statement
+          (struct_literal
+            (named_type
+              (identifier))
+            (named_field_initializer
+              (identifier)
+              (boolean_literal)))
+          (block))
+        (for_statement
+          (for_in_clause
+            (identifier)
+            (in)
+            (struct_literal
+              (generic_type
+                (scoped_identifier
+                  (identifier)
+                  (identifier))
+                (type_argument_list
+                  (named_type
+                    (identifier))))))
+          (block))
+        (match_statement
+          (struct_literal
+            (named_type
+              (identifier)))
+          (match_arm
+            (variant_pattern
+              (variant_case
+                (scoped_identifier
+                  (generic_type
+                    (identifier)
+                    (type_argument_list
+                      (named_type
+                        (identifier))))
+                  (identifier))))
+            (block)))
+        (if_statement
+          (struct_literal
+            (named_field_initializer
+              (identifier)
+              (boolean_literal)))
+          (block))
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (named_type
+              (identifier))
+            (struct_literal)))
+        (if_statement
+          (call_expression
+            (selector_expression
+              (struct_literal
+                (named_type
+                  (identifier))
+                (named_field_initializer
+                  (identifier)
+                  (number_literal)))
+              (identifier))
+            (argument_list))
+          (block))
+        (if_statement
+          (call_expression
+            (selector_expression
+              (struct_literal
+                (generic_type
+                  (scoped_identifier
+                    (identifier)
+                    (identifier))
+                  (type_argument_list
+                    (named_type
+                      (identifier))))
+                (named_field_initializer
+                  (identifier)
+                  (number_literal)))
+              (identifier))
+            (argument_list))
+          (block)
+          (block))
+        (for_statement
+          (call_expression
+            (selector_expression
+              (struct_literal
+                (named_type
+                  (identifier))
+                (named_field_initializer
+                  (identifier)
+                  (number_literal)))
+              (identifier))
+            (argument_list))
+          (block))
+        (for_statement
+          (for_in_clause
+            (identifier)
+            (in)
+            (call_expression
+              (selector_expression
+                (struct_literal
+                  (generic_type
+                    (scoped_identifier
+                      (identifier)
+                      (identifier))
+                    (type_argument_list
+                      (named_type
+                        (identifier))))
+                  (named_field_initializer
+                    (identifier)
+                    (number_literal)))
+                (identifier))
+              (argument_list)))
+          (block))
+        (match_statement
+          (variant_literal
+            (variant_case
+              (scoped_identifier
+                (generic_type
+                  (identifier)
+                  (type_argument_list
+                    (named_type
+                      (identifier))))
+                (identifier)))
+            (with)
+            (struct_literal
+              (named_type
+                (identifier))
+              (named_field_initializer
+                (identifier)
+                (number_literal))))
+          (match_arm
+            (variant_pattern
+              (variant_case
+                (scoped_identifier
+                  (generic_type
+                    (identifier)
+                    (type_argument_list
+                      (named_type
+                        (identifier))))
+                  (identifier)))
+              (with)
+              (identifier))
+            (block)))
+        (if_statement
+          (identifier)
+          (block))
+        (for_statement
+          (identifier)
+          (block))
+        (for_statement
+          (for_in_clause
+            (identifier)
+            (in)
+            (identifier))
+          (block))
+        (match_statement
+          (identifier)
+          (match_arm
+            (variant_pattern
+              (variant_case
+                (scoped_identifier
+                  (generic_type
+                    (identifier)
+                    (type_argument_list
+                      (named_type
+                        (identifier))))
+                  (identifier))))
+            (block)))))))
+
+==================
+Enum with named and inferred struct payloads
+==================
+
+fn payloads() {
+    let named = Result<Point>::Ok with Point.{ x = 1 };
+    let inferred = Result<Point>::Ok with .{ x = 1 };
+    let scalar = Result<i32>::Ok with 1;
+    let unit = Result<i32>::Pending;
+}
+
+---
+
+(source_file
+  (top_level_item
+    (function_declaration
+      (identifier)
+      (parameter_list)
+      (block
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (variant_literal
+              (variant_case
+                (scoped_identifier
+                  (generic_type
+                    (identifier)
+                    (type_argument_list
+                      (named_type
+                        (identifier))))
+                  (identifier)))
+              (with)
+              (struct_literal
+                (named_type
+                  (identifier))
+                (named_field_initializer
+                  (identifier)
+                  (number_literal))))))
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (variant_literal
+              (variant_case
+                (scoped_identifier
+                  (generic_type
+                    (identifier)
+                    (type_argument_list
+                      (named_type
+                        (identifier))))
+                  (identifier)))
+              (with)
+              (struct_literal
+                (named_field_initializer
+                  (identifier)
+                  (number_literal))))))
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (variant_literal
+              (variant_case
+                (scoped_identifier
+                  (generic_type
+                    (identifier)
+                    (type_argument_list
+                      (named_type
+                        (identifier))))
+                  (identifier)))
+              (with)
+              (number_literal))))
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (scoped_identifier
+              (generic_type
+                (identifier)
+                (type_argument_list
+                  (named_type
+                    (identifier))))
+              (identifier))))))))
+
+==================
+Reject old named struct spelling
+:error
+==================
+
+fn old() { let point = .Point{ x = 1 }; }
+
+---
+
+(source_file)
+
+==================
+Reject old empty named struct spelling
+:error
+==================
+
+fn old() { let point = .Point{}; }
+
+---
+
+(source_file)
+
+==================
+Reject old generic struct spelling
+:error
+==================
+
+fn old() { let point = .Box<i32>{ value = 1 }; }
+
+---
+
+(source_file)
+
+==================
+Reject old qualified struct spelling
+:error
+==================
+
+fn old() { let point = .pkg::Point{ x = 1 }; }
+
+---
+
+(source_file)
+
+==================
+Reject named struct without dot
+:error
+==================
+
+fn invalid() { let point = Point{ x = 1 }; }
+
+---
+
+(source_file)
+
+==================
+Reject colon field initializer
+:error
+==================
+
+fn invalid() { let point = Point.{ x: 1 }; }
+
+---
+
+(source_file)
