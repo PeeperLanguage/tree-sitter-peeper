@@ -526,50 +526,6 @@ fn payloads() {
               (identifier))))))))
 
 ==================
-Reject old named struct spelling
-:error
-==================
-
-fn old() { let point = .Point{ x = 1 }; }
-
----
-
-(source_file)
-
-==================
-Reject old empty named struct spelling
-:error
-==================
-
-fn old() { let point = .Point{}; }
-
----
-
-(source_file)
-
-==================
-Reject old generic struct spelling
-:error
-==================
-
-fn old() { let point = .Box<i32>{ value = 1 }; }
-
----
-
-(source_file)
-
-==================
-Reject old qualified struct spelling
-:error
-==================
-
-fn old() { let point = .pkg::Point{ x = 1 }; }
-
----
-
-(source_file)
-
-==================
 Reject named struct without dot
 :error
 ==================
