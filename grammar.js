@@ -1,16 +1,17 @@
 const PREC = {
-  catch: 1,
-  pipe: 1,
-  coalesce: 2,
-  or: 3,
-  and: 4,
-  equality: 5,
-  comparison: 6,
-  range: 6,
-  sum: 7,
-  product: 8,
-  prefix: 9,
-  postfix: 10,
+  orelse: 1,
+  catch: 2,
+  pipe: 2,
+  coalesce: 3,
+  or: 4,
+  and: 5,
+  equality: 6,
+  comparison: 7,
+  range: 7,
+  sum: 8,
+  product: 9,
+  prefix: 10,
+  postfix: 11,
 };
 
 const NUMBER_POSTFIX = /[iuf](?:[0-9](?:[0-9]|_[0-9])*)?/;
@@ -176,11 +177,8 @@ export default grammar({
     enum_variant: ($) =>
       seq(
         field("name", $.identifier),
-        optional(seq(":", field("payload", choice($.type, $.enum_variant_struct_type)))),
+        optional(seq(":", field("payload", $.type))),
       ),
-
-    enum_variant_struct_type: ($) =>
-      seq("{", commaSep1($.field_declaration), optional(","), "}"),
 
     attribute: ($) =>
       seq(
@@ -264,6 +262,7 @@ export default grammar({
         $.labeled_statement,
         $.type_declaration,
         $.let_statement,
+        $.destructure_statement,
         $.const_statement,
         $.return_statement,
         $.if_statement,
@@ -294,6 +293,31 @@ export default grammar({
         optional(seq("=", field("value", $.expression))),
       ),
 
+    // let .{ field, field as name, _ } = value;
+    destructure_statement: ($) =>
+      seq(
+        $.let,
+        field("fields", $.destructure_fields),
+        "=",
+        field("value", $.expression),
+        optional(";"),
+      ),
+
+    destructure_fields: ($) =>
+      seq(
+        ".",
+        "{",
+        optional(commaSep1(choice($.destructure_field, field("rest", "_")))),
+        optional(","),
+        "}",
+      ),
+
+    destructure_field: ($) =>
+      seq(
+        field("name", $.identifier),
+        optional(seq("as", field("binding", $.identifier))),
+      ),
+
     const_statement: ($) => seq($.const_clause, optional(";")),
 
     const_clause: ($) =>
@@ -322,40 +346,37 @@ export default grammar({
     match_statement: ($) =>
       seq("match", field("value", $.expression), "{", repeat($.match_arm), "}"),
 
+    // `_ => { }` is the fallback arm.
     match_arm: ($) =>
       seq(
-        field("pattern", $.variant_pattern),
+        field("pattern", choice($.variant_pattern, $.fallback_pattern)),
         "=>",
         field("body", $.block),
       ),
 
+    fallback_pattern: () => "_",
+
+    // Case, or `Case with payload`: none, a name, `.{ fields }`, or a case of
+    // the payload's enum with a payload pattern of its own.
     variant_pattern: ($) =>
-      seq(
-        field("case", $.variant_case),
-        optional(
-          seq(
-            $.with,
-            field(
-              "payload",
-              choice($.variant_pattern_fields, $.identifier, "_"),
+      prec.right(
+        seq(
+          field("case", $.variant_case),
+          optional(
+            seq(
+              $.with,
+              field(
+                "payload",
+                choice(
+                  $.none_literal,
+                  $.identifier,
+                  $.destructure_fields,
+                  $.variant_pattern,
+                ),
+              ),
             ),
           ),
         ),
-      ),
-
-    variant_pattern_fields: ($) =>
-      seq(
-        "{",
-        optional(commaSep1($.variant_pattern_field)),
-        optional(","),
-        "}",
-      ),
-
-    variant_pattern_field: ($) =>
-      seq(
-        field("name", $.identifier),
-        "=",
-        choice(field("binding", $.identifier), field("discard", "_")),
       ),
 
     for_statement: ($) =>
@@ -422,6 +443,7 @@ export default grammar({
 
     expression: ($) =>
       choice(
+        $.orelse_expression,
         $.catch_expression,
         $.lambda_expression,
         $.range_expression,
@@ -567,9 +589,20 @@ export default grammar({
         PREC.prefix,
         choice(
           seq(
-            choice("-", "!", "?", "@", $.comptime, $.move),
+            choice("-", "!", "?", "@", "&", seq("&", $.mut), $.comptime, $.move),
             field("value", $.expression),
           ),
+        ),
+      ),
+
+    // value orelse fallback, or value orelse { ... }
+    orelse_expression: ($) =>
+      prec.right(
+        PREC.orelse,
+        seq(
+          field("value", $.expression),
+          "orelse",
+          field("fallback", choice($.expression, $.block)),
         ),
       ),
 

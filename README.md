@@ -13,7 +13,8 @@ Tree-sitter grammar for the current Peeper language revision.
 - `let` / `let mut`
 - `if` / `else`
 - fully named `Enum::Variant with expression` construction and `is` case tests
-- statement `match` with whole-payload bindings or struct field patterns
+- statement `match` with payload patterns (`Case with none`, `Case with name`, `Case with .{ field as name }`, a nested case) and the `_` arm
+- `let .{ field, field as name, _ } = value;`, `value orelse fallback`, and `&` / `&mut` borrow expressions
 - `*T` owned pointer types, `rawptr`, and `?T` optionals
 - array literals and indexing
 - postfix `++` / `--`

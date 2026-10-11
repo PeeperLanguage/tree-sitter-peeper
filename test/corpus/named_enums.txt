@@ -3,10 +3,10 @@ Enum data variants
 ==================
 
 enum Result<T> {
-    Ok: {
+    Ok: struct {
         value: T,
     },
-    Error: {
+    Error: struct {
         message: str,
     },
     Failed: str,
@@ -24,14 +24,14 @@ enum Result<T> {
           (identifier)))
       (enum_variant
         (identifier)
-        (enum_variant_struct_type
+        (struct_type
           (field_declaration
             (identifier)
             (named_type
               (identifier)))))
       (enum_variant
         (identifier)
-        (enum_variant_struct_type
+        (struct_type
           (field_declaration
             (identifier)
             (str_type))))
@@ -137,11 +137,11 @@ Statement match
 
 fn inspect(result: Result<i32>) {
     match result {
-        Result<i32>::Ok with { value = payload } => {
+        Result<i32>::Ok with .{ value as payload, _ } => {
             use(payload);
         }
-        Result<i32>::Error with { message = _ } => {
-            report();
+        Result<i32>::Error => {
+            report(result.message);
         }
         Result<i32>::Pending => {
             wait();
@@ -178,8 +178,8 @@ fn inspect(result: Result<i32>) {
                         (identifier))))
                   (identifier)))
               (with)
-              (variant_pattern_fields
-                (variant_pattern_field
+              (destructure_fields
+                (destructure_field
                   (identifier)
                   (identifier))))
             (block
@@ -197,16 +197,15 @@ fn inspect(result: Result<i32>) {
                     (type_argument_list
                       (named_type
                         (identifier))))
-                  (identifier)))
-              (with)
-              (variant_pattern_fields
-                (variant_pattern_field
                   (identifier))))
             (block
               (expression_statement
                 (call_expression
                   (identifier)
-                  (argument_list)))))
+                  (argument_list
+                    (selector_expression
+                      (identifier)
+                      (identifier)))))))
           (match_arm
             (variant_pattern
               (variant_case
@@ -222,3 +221,245 @@ fn inspect(result: Result<i32>) {
                 (call_expression
                   (identifier)
                   (argument_list))))))))))
+
+==============
+Match patterns
+==============
+
+fn read(slot: Slot) -> i32 {
+    match &mut holder.slot {
+        Slot::Value with none => { return 0; }
+        Slot::Value with value => { return value; }
+        Slot::Inner with Shape::Circle with .{ radius, scale as factor } => { return radius; }
+        Slot::Inner with Shape::Empty => { return 1; }
+        _ => { return 2; }
+    }
+}
+
+---
+
+(source_file
+  (top_level_item
+    (function_declaration
+      (identifier)
+      (parameter_list
+        (parameter
+          (typed_parameter
+            (identifier)
+            (named_type
+              (identifier)))))
+      (named_type
+        (identifier))
+      (block
+        (match_statement
+          (prefix_expression
+            (mut)
+            (selector_expression
+              (identifier)
+              (identifier)))
+          (match_arm
+            (variant_pattern
+              (variant_case
+                (scoped_identifier
+                  (identifier)
+                  (identifier)))
+              (with)
+              (none_literal))
+            (block
+              (return_statement
+                (number_literal))))
+          (match_arm
+            (variant_pattern
+              (variant_case
+                (scoped_identifier
+                  (identifier)
+                  (identifier)))
+              (with)
+              (identifier))
+            (block
+              (return_statement
+                (identifier))))
+          (match_arm
+            (variant_pattern
+              (variant_case
+                (scoped_identifier
+                  (identifier)
+                  (identifier)))
+              (with)
+              (variant_pattern
+                (variant_case
+                  (scoped_identifier
+                    (identifier)
+                    (identifier)))
+                (with)
+                (destructure_fields
+                  (destructure_field
+                    (identifier))
+                  (destructure_field
+                    (identifier)
+                    (identifier)))))
+            (block
+              (return_statement
+                (identifier))))
+          (match_arm
+            (variant_pattern
+              (variant_case
+                (scoped_identifier
+                  (identifier)
+                  (identifier)))
+              (with)
+              (variant_pattern
+                (variant_case
+                  (scoped_identifier
+                    (identifier)
+                    (identifier)))))
+            (block
+              (return_statement
+                (number_literal))))
+          (match_arm
+            (fallback_pattern)
+            (block
+              (return_statement
+                (number_literal)))))))))
+
+==============================
+Destructure statement and orelse
+==============================
+
+fn take(pair: Pair, maybe: ?i32) -> i32 {
+    let .{ first as head, tag, _ } = pair;
+    let count = maybe orelse 0;
+    let item = find(head) orelse { return tag; };
+    return add(count, next() orelse item orelse 1);
+}
+
+---
+
+(source_file
+  (top_level_item
+    (function_declaration
+      (identifier)
+      (parameter_list
+        (parameter
+          (typed_parameter
+            (identifier)
+            (named_type
+              (identifier))))
+        (parameter
+          (typed_parameter
+            (identifier)
+            (optional_type
+              (named_type
+                (identifier))))))
+      (named_type
+        (identifier))
+      (block
+        (destructure_statement
+          (let)
+          (destructure_fields
+            (destructure_field
+              (identifier)
+              (identifier))
+            (destructure_field
+              (identifier)))
+          (identifier))
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (orelse_expression
+              (identifier)
+              (number_literal))))
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (orelse_expression
+              (call_expression
+                (identifier)
+                (argument_list
+                  (identifier)))
+              (block
+                (return_statement
+                  (identifier))))))
+        (return_statement
+          (call_expression
+            (identifier)
+            (argument_list
+              (identifier)
+              (orelse_expression
+                (call_expression
+                  (identifier)
+                  (argument_list))
+                (orelse_expression
+                  (identifier)
+                  (number_literal))))))))))
+
+==========================
+Payload read under the name
+==========================
+
+fn read(shape: Shape, maybe: ?i32) -> i32 {
+    if &shape is Shape::Circle { return shape.radius; }
+    if !(shape is Shape::Code) { return 0; }
+    for maybe != none { return maybe; }
+    return shape;
+}
+
+---
+
+(source_file
+  (top_level_item
+    (function_declaration
+      (identifier)
+      (parameter_list
+        (parameter
+          (typed_parameter
+            (identifier)
+            (named_type
+              (identifier))))
+        (parameter
+          (typed_parameter
+            (identifier)
+            (optional_type
+              (named_type
+                (identifier))))))
+      (named_type
+        (identifier))
+      (block
+        (if_statement
+          (is_expression
+            (prefix_expression
+              (identifier))
+            (is)
+            (variant_case
+              (scoped_identifier
+                (identifier)
+                (identifier))))
+          (block
+            (return_statement
+              (selector_expression
+                (identifier)
+                (identifier)))))
+        (if_statement
+          (prefix_expression
+            (parenthesized_expression
+              (is_expression
+                (identifier)
+                (is)
+                (variant_case
+                  (scoped_identifier
+                    (identifier)
+                    (identifier))))))
+          (block
+            (return_statement
+              (number_literal))))
+        (for_statement
+          (binary_expression
+            (identifier)
+            (none_literal))
+          (block
+            (return_statement
+              (identifier))))
+        (return_statement
+          (identifier))))))
