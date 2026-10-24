@@ -1,0 +1,30 @@
+======================================
+Raw pointers with and without a type
+======================================
+
+fn F(p: rawptr i32) -> rawptr { let q: rawptr rawptr u8 = p; }
+
+---
+
+(source_file
+  (top_level_item
+    (function_declaration
+      (identifier)
+      (parameter_list
+        (parameter
+          (typed_parameter
+            (identifier)
+            (raw_pointer_type
+              (named_type
+                (identifier))))))
+      (raw_pointer_type)
+      (block
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (raw_pointer_type
+              (raw_pointer_type
+                (named_type
+                  (identifier))))
+            (identifier)))))))

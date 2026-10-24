@@ -772,7 +772,9 @@ export default grammar({
     reference_type: ($) =>
       seq("&", optional($.mut), field("target", $.type)),
     owned_pointer_type: ($) => seq("*", field("target", $.type)),
-    raw_pointer_type: () => "rawptr",
+    // `rawptr`, or `rawptr T`
+    raw_pointer_type: ($) =>
+      prec.right(seq("rawptr", optional(field("target", $.type)))),
     str_type: () => "str",
     approx_type: ($) => seq("~", $.type),
     variadic_type: ($) => seq("...", $.type),

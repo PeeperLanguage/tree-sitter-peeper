@@ -2192,6 +2192,22 @@
     }
   },
   {
+    "type": "raw_pointer_type",
+    "named": true,
+    "fields": {
+      "target": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "type",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "receiver",
     "named": true,
     "fields": {
@@ -3147,8 +3163,8 @@
     "named": false
   },
   {
-    "type": "raw_pointer_type",
-    "named": true
+    "type": "rawptr",
+    "named": false
   },
   {
     "type": "return",
