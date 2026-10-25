@@ -18,17 +18,17 @@ const NUMBER_POSTFIX = /[iuf](?:[0-9](?:[0-9]|_[0-9])*)?/;
 
 const HEX_NUMBER = new RegExp(
   String.raw`0[xX][0-9A-Fa-f](?:[0-9A-Fa-f]|_[0-9A-Fa-f])*` +
-  String.raw`(?:${NUMBER_POSTFIX.source})?`
+  String.raw`(?:_?${NUMBER_POSTFIX.source})?`
 );
 
 const OCT_NUMBER = new RegExp(
   String.raw`0[oO][0-7](?:[0-7]|_[0-7])*` +
-  String.raw`(?:${NUMBER_POSTFIX.source})?`
+  String.raw`(?:_?${NUMBER_POSTFIX.source})?`
 );
 
 const BIN_NUMBER = new RegExp(
   String.raw`0[bB][01](?:[01]|_[01])*` +
-  String.raw`(?:${NUMBER_POSTFIX.source})?`
+  String.raw`(?:_?${NUMBER_POSTFIX.source})?`
 );
 
 const DEC_NUMBER = new RegExp(
@@ -41,6 +41,15 @@ const FLOAT_NUMBER = new RegExp(
   String.raw`(?:\.[0-9](?:[0-9]|_[0-9])*)?` +
   String.raw`(?:[eE][+-]?[0-9](?:[0-9]|_[0-9])*)?` +
   String.raw`(?:${NUMBER_POSTFIX.source})?`
+);
+
+// What the compiler reads as one number token, valid or not: letters and
+// digits after a number make one bad number (`1abc`, `0xFG`, `06_x`), not a
+// number then a name. A valid number of the same length wins (rule order).
+const ANY_NUMBER = new RegExp(
+  String.raw`[0-9][0-9A-Za-z_]*` +
+  String.raw`(?:\.[0-9][0-9A-Za-z_]*)?` +
+  String.raw`(?:[eE][+-][0-9][0-9A-Za-z_]*)?`
 );
 
 const IMAG_NUMBER = new RegExp(
@@ -465,6 +474,7 @@ export default grammar({
         $.identifier,
         $.scoped_identifier,
         $.number_literal,
+        $.invalid_number,
         $.string_literal,
         $.c_string_literal,
         $.char_literal,
@@ -782,7 +792,7 @@ export default grammar({
     array_type: ($) =>
       seq("[", field("size", $.array_length), "]", field("element", $.type)),
     array_length: ($) =>
-      choice($.number_literal, $.identifier, $.scoped_identifier),
+      choice($.number_literal, $.invalid_number, $.identifier, $.scoped_identifier),
     map_type: ($) => seq("map", "[", field("key", $.type), "]", field("value", $.type)),
     tuple_type: ($) => seq("(", commaSep1($.type), optional(","), ")"),
     error_union_type: ($) =>
@@ -842,6 +852,8 @@ export default grammar({
       token(
         choice(HEX_NUMBER, OCT_NUMBER, BIN_NUMBER, DEC_NUMBER, IMAG_NUMBER, FLOAT_NUMBER),
       ),
+    // Not highlighted as a number: the compiler rejects it.
+    invalid_number: ($) => token(ANY_NUMBER),
     string_literal: ($) => token(/"(?:\\.|[^"\\\n])*"/),
     c_string_literal: ($) => token(/c"(?:\\.|[^"\\\n])*"/),
     char_literal: ($) => token(/'(?:\\.|[^'\\\n])+'/),

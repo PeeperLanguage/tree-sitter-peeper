@@ -56,6 +56,10 @@
         "named": true
       },
       {
+        "type": "invalid_number",
+        "named": true
+      },
+      {
         "type": "is_expression",
         "named": true
       },
@@ -317,6 +321,10 @@
       "types": [
         {
           "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "invalid_number",
           "named": true
         },
         {
@@ -3115,6 +3123,10 @@
   },
   {
     "type": "in",
+    "named": true
+  },
+  {
+    "type": "invalid_number",
     "named": true
   },
   {

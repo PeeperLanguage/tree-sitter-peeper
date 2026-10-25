@@ -1,0 +1,78 @@
+======================================
+Valid numbers stay numbers
+======================================
+
+fn F() { let a = 1_000u16; let b = 0x1f_u8; let c = 2.5e-3f64; let d = 1..2; }
+
+---
+
+(source_file
+  (top_level_item
+    (function_declaration
+      (identifier)
+      (parameter_list)
+      (block
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (number_literal)))
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (number_literal)))
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (number_literal)))
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (range_expression
+              (number_literal)
+              (number_literal))))))))
+
+======================================
+Letters after a number make one invalid number
+======================================
+
+fn F() { let a = 1abc; let b = 06_raw; let c = 0xFG; let d = 5u8x; let e = 1 - x; }
+
+---
+
+(source_file
+  (top_level_item
+    (function_declaration
+      (identifier)
+      (parameter_list)
+      (block
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (invalid_number)))
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (invalid_number)))
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (invalid_number)))
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (invalid_number)))
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (binary_expression
+              (number_literal)
+              (identifier))))))))
