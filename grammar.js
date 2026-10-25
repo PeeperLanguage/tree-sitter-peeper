@@ -100,7 +100,6 @@ export default grammar({
     mut: () => "mut",
     self: () => "self",
     iface: () => "iface",
-    from: () => "from",
 
     top_level_item: ($) =>
       choice(
@@ -763,7 +762,7 @@ export default grammar({
 
     return_origin_clause: ($) =>
       seq(
-        $.from,
+        $.in,
         choice(
           field("source", $.identifier),
           seq(

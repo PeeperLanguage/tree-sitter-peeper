@@ -1,0 +1,56 @@
+======================================
+Returned references name their sources with `in`
+======================================
+
+fn F(a: &i32, b: &i32) -> &i32 in (a, b) { for x in a {} }
+fn G(a: &i32) -> &i32 in a;
+
+---
+
+(source_file
+  (top_level_item
+    (function_declaration
+      (identifier)
+      (parameter_list
+        (parameter
+          (typed_parameter
+            (identifier)
+            (reference_type
+              (named_type
+                (identifier)))))
+        (parameter
+          (typed_parameter
+            (identifier)
+            (reference_type
+              (named_type
+                (identifier))))))
+      (reference_type
+        (named_type
+          (identifier)))
+      (return_origin_clause
+        (in)
+        (identifier)
+        (identifier))
+      (block
+        (for_statement
+          (for_in_clause
+            (identifier)
+            (in)
+            (identifier))
+          (block)))))
+  (top_level_item
+    (function_declaration
+      (identifier)
+      (parameter_list
+        (parameter
+          (typed_parameter
+            (identifier)
+            (reference_type
+              (named_type
+                (identifier))))))
+      (reference_type
+        (named_type
+          (identifier)))
+      (return_origin_clause
+        (in)
+        (identifier)))))

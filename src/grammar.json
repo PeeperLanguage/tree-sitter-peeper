@@ -50,10 +50,6 @@
       "type": "STRING",
       "value": "iface"
     },
-    "from": {
-      "type": "STRING",
-      "value": "from"
-    },
     "top_level_item": {
       "type": "CHOICE",
       "members": [
@@ -4052,7 +4048,7 @@
       "members": [
         {
           "type": "SYMBOL",
-          "name": "from"
+          "name": "in"
         },
         {
           "type": "CHOICE",

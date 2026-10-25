@@ -2277,7 +2277,7 @@
       "required": true,
       "types": [
         {
-          "type": "from",
+          "type": "in",
           "named": true
         }
       ]
@@ -3100,10 +3100,6 @@
   {
     "type": "for",
     "named": false
-  },
-  {
-    "type": "from",
-    "named": true
   },
   {
     "type": "identifier",
