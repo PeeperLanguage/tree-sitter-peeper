@@ -1,0 +1,158 @@
+==================================================
+Dereference reads and writes through a reference
+==================================================
+
+fn F(n: &mut i32) { n.* = n.* * 2; }
+
+---
+
+(source_file
+  (top_level_item
+    (function_declaration
+      (identifier)
+      (parameter_list
+        (parameter
+          (typed_parameter
+            (identifier)
+            (reference_type
+              (mut)
+              (named_type
+                (identifier))))))
+      (block
+        (assignment_statement
+          (assignment_clause
+            (dereference_expression
+              (identifier))
+            (binary_expression
+              (dereference_expression
+                (identifier))
+              (number_literal))))))))
+
+=====================================
+Array literals with each array type
+=====================================
+
+fn F() { let a = [3]i32{1, 2}; let b = [_]u8{}; let c = []i32{1}; let d = [..]i32{}; }
+
+---
+
+(source_file
+  (top_level_item
+    (function_declaration
+      (identifier)
+      (parameter_list)
+      (block
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (array_literal
+              (array_type
+                (array_length
+                  (number_literal))
+                (named_type
+                  (identifier)))
+              (number_literal)
+              (number_literal))))
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (array_literal
+              (array_type
+                (array_length
+                  (identifier))
+                (named_type
+                  (identifier))))))
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (array_literal
+              (slice_type
+                (named_type
+                  (identifier)))
+              (number_literal))))
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (array_literal
+              (slice_type
+                (named_type
+                  (identifier))))))))))
+
+=====================================================
+Shifts and bitwise operators bind as the compiler's
+=====================================================
+
+fn F() { let a = 1 << 2 + 3; let b = c | d ^ e & f; let g = ~h; }
+
+---
+
+(source_file
+  (top_level_item
+    (function_declaration
+      (identifier)
+      (parameter_list)
+      (block
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (binary_expression
+              (number_literal)
+              (binary_expression
+                (number_literal)
+                (number_literal)))))
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (binary_expression
+              (identifier)
+              (binary_expression
+                (identifier)
+                (binary_expression
+                  (identifier)
+                  (identifier))))))
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (prefix_expression
+              (identifier))))))))
+
+============================================
+A cast binds looser than a prefix operator
+============================================
+
+fn F() { let a = -b as i64; let c = d + e as i64; }
+
+---
+
+(source_file
+  (top_level_item
+    (function_declaration
+      (identifier)
+      (parameter_list)
+      (block
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (cast_expression
+              (prefix_expression
+                (identifier))
+              (named_type
+                (identifier)))))
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (binary_expression
+              (identifier)
+              (cast_expression
+                (identifier)
+                (named_type
+                  (identifier))))))))))

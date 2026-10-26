@@ -1,3 +1,4 @@
+// As the compiler's `Precedence`, loosest first.
 const PREC = {
   orelse: 1,
   catch: 2,
@@ -5,13 +6,18 @@ const PREC = {
   coalesce: 3,
   or: 4,
   and: 5,
-  equality: 6,
-  comparison: 7,
-  range: 7,
-  sum: 8,
-  product: 9,
-  prefix: 10,
-  postfix: 11,
+  bit_or: 6,
+  bit_xor: 7,
+  bit_and: 8,
+  equality: 9,
+  comparison: 10,
+  range: 10,
+  shift: 11,
+  sum: 12,
+  product: 13,
+  cast: 14,
+  prefix: 15,
+  postfix: 16,
 };
 
 const NUMBER_POSTFIX = /[iuf](?:[0-9](?:[0-9]|_[0-9])*)?/;
@@ -74,8 +80,6 @@ export default grammar({
   conflicts: ($) => [
     [$.expression, $.named_type],
     [$.expression, $.generic_type],
-    [$.array_literal, $.slice_type],
-    [$.expression, $.array_length],
     [$.expression, $.lambda_parameter],
     [$.expression, $.lambda_parameter, $.named_type],
     [$.type, $.function_type_parameter],
@@ -462,6 +466,7 @@ export default grammar({
         $.error_propagate_expression,
         $.spread_expression,
         $.cast_expression,
+        $.dereference_expression,
         $.index_expression,
         $.selector_expression,
         $.generic_call_expression,
@@ -501,8 +506,15 @@ export default grammar({
         optional(seq(":", field("type", choice($.variadic_type, $.type)))),
       ),
 
+    // `[N]T{ values }`, `[_]T{ ... }`, `[]T{ ... }` or `[..]T{ ... }`
     array_literal: ($) =>
-      seq("[", optional(commaSep1($.expression)), optional(","), "]"),
+      seq(
+        field("type", choice($.array_type, $.slice_type)),
+        "{",
+        optional(commaSep1($.expression)),
+        optional(","),
+        "}",
+      ),
 
     struct_literal: ($) =>
       seq(
@@ -572,6 +584,10 @@ export default grammar({
         ),
       ),
 
+    // `x.*`: two tokens, as the compiler reads it
+    dereference_expression: ($) =>
+      prec.left(PREC.postfix, seq(field("value", $.expression), ".", "*")),
+
     error_propagate_expression: ($) =>
       prec.left(PREC.postfix, seq(field("value", $.expression), "!!")),
 
@@ -589,7 +605,7 @@ export default grammar({
 
     cast_expression: ($) =>
       prec.left(
-        PREC.postfix,
+        PREC.cast,
         seq(field("value", $.expression), "as", field("type", $.type)),
       ),
 
@@ -598,7 +614,7 @@ export default grammar({
         PREC.prefix,
         choice(
           seq(
-            choice("-", "!", "?", "@", "&", seq("&", $.mut), $.comptime, $.move),
+            choice("-", "!", "~", "?", "@", "&", seq("&", $.mut), $.comptime, $.move),
             field("value", $.expression),
           ),
         ),
@@ -673,6 +689,18 @@ export default grammar({
           seq(field("left", $.expression), "&&", field("right", $.expression)),
         ),
         prec.left(
+          PREC.bit_or,
+          seq(field("left", $.expression), "|", field("right", $.expression)),
+        ),
+        prec.left(
+          PREC.bit_xor,
+          seq(field("left", $.expression), "^", field("right", $.expression)),
+        ),
+        prec.left(
+          PREC.bit_and,
+          seq(field("left", $.expression), "&", field("right", $.expression)),
+        ),
+        prec.left(
           PREC.equality,
           seq(
             field("left", $.expression),
@@ -685,6 +713,14 @@ export default grammar({
           seq(
             field("left", $.expression),
             choice("<", "<=", ">", ">="),
+            field("right", $.expression),
+          ),
+        ),
+        prec.left(
+          PREC.shift,
+          seq(
+            field("left", $.expression),
+            choice("<<", ">>"),
             field("right", $.expression),
           ),
         ),
@@ -787,7 +823,8 @@ export default grammar({
     str_type: () => "str",
     approx_type: ($) => seq("~", $.type),
     variadic_type: ($) => seq("...", $.type),
-    slice_type: ($) => seq("[", "]", field("element", $.type)),
+    // `[]T`, or `[..]T`
+    slice_type: ($) => seq("[", optional(".."), "]", field("element", $.type)),
     array_type: ($) =>
       seq("[", field("size", $.array_length), "]", field("element", $.type)),
     array_length: ($) =>
