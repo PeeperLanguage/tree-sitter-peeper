@@ -220,7 +220,7 @@ export default grammar({
         repeat(field("attribute", $.attribute)),
         optional("unsafe"),
         "fn",
-        optional(field("receiver", $.receiver)),
+        optional(seq(field("owner", $.identifier), "::")),
         field("name", $.identifier),
         optional(field("type_parameters", $.type_parameter_list)),
         field("parameters", $.parameter_list),
@@ -228,9 +228,6 @@ export default grammar({
         optional(field("return_origins", $.return_origin_clause)),
         choice(field("body", $.block), ";"),
       ),
-
-    receiver: ($) =>
-      seq("(", field("parameter", $.typed_parameter), ")"),
 
     type_parameter_list: ($) =>
       seq("<", commaSep1($.type_parameter), optional(","), ">"),
@@ -250,7 +247,11 @@ export default grammar({
     parameter_list: ($) =>
       seq("(", optional(commaSep1($.parameter)), optional(","), ")"),
 
-    parameter: ($) => $.typed_parameter,
+    parameter: ($) => choice($.self_parameter, $.typed_parameter),
+
+    // `self`, `mut self`, `&self` or `&mut self`: of the type the function
+    // belongs to, so no type is written.
+    self_parameter: ($) => seq(optional("&"), optional($.mut), $.self),
 
     typed_parameter: ($) =>
       choice(
@@ -476,6 +477,7 @@ export default grammar({
         $.struct_literal,
         $.variant_literal,
         $.identifier,
+        $.self,
         $.scoped_identifier,
         $.number_literal,
         $.invalid_number,
@@ -800,7 +802,7 @@ export default grammar({
       seq(
         $.in,
         choice(
-          field("source", $.identifier),
+          field("source", choice($.identifier, $.self)),
           seq(
             "(",
             commaSep1(field("source", $.identifier)),
@@ -852,7 +854,6 @@ export default grammar({
       prec.right(
         seq(
           "fn",
-          field("receiver", $.receiver),
           field("name", $.identifier),
           optional(field("type_parameters", $.type_parameter_list)),
           field("parameters", $.parameter_list),

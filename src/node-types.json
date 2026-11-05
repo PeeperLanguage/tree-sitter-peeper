@@ -108,6 +108,10 @@
         "named": true
       },
       {
+        "type": "self",
+        "named": true
+      },
+      {
         "type": "spread_expression",
         "named": true
       },
@@ -1239,22 +1243,22 @@
           }
         ]
       },
+      "owner": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
       "parameters": {
         "multiple": false,
         "required": true,
         "types": [
           {
             "type": "parameter_list",
-            "named": true
-          }
-        ]
-      },
-      "receiver": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "receiver",
             "named": true
           }
         ]
@@ -1583,16 +1587,6 @@
         "types": [
           {
             "type": "parameter_list",
-            "named": true
-          }
-        ]
-      },
-      "receiver": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "receiver",
             "named": true
           }
         ]
@@ -2084,6 +2078,10 @@
       "required": true,
       "types": [
         {
+          "type": "self_parameter",
+          "named": true
+        },
+        {
           "type": "typed_parameter",
           "named": true
         }
@@ -2251,22 +2249,6 @@
     }
   },
   {
-    "type": "receiver",
-    "named": true,
-    "fields": {
-      "parameter": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "typed_parameter",
-            "named": true
-          }
-        ]
-      }
-    }
-  },
-  {
     "type": "reference_type",
     "named": true,
     "fields": {
@@ -2302,6 +2284,10 @@
         "types": [
           {
             "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "self",
             "named": true
           }
         ]
@@ -2392,6 +2378,25 @@
           }
         ]
       }
+    }
+  },
+  {
+    "type": "self_parameter",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "mut",
+          "named": true
+        },
+        {
+          "type": "self",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -3224,6 +3229,10 @@
   {
     "type": "return",
     "named": false
+  },
+  {
+    "type": "self",
+    "named": true
   },
   {
     "type": "str_type",

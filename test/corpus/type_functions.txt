@@ -1,0 +1,126 @@
+======================================
+A type's functions, `self` and dot calls
+======================================
+
+fn Point::New(x: i32) -> Point { return .{ x = x }; }
+fn Point::Get(&self) -> &i32 in self { return &self.x; }
+fn Point::Set(&mut self, x: i32) { self.x = x; }
+fn Point::Into(self) -> i32 { return self.x; }
+fn Point::Grow(mut self) -> Point { return self; }
+fn main() { let p = Point::New(1); let x = p.Into(); }
+
+---
+
+(source_file
+  (top_level_item
+    (function_declaration
+      (identifier)
+      (identifier)
+      (parameter_list
+        (parameter
+          (typed_parameter
+            (identifier)
+            (named_type
+              (identifier)))))
+      (named_type
+        (identifier))
+      (block
+        (return_statement
+          (struct_literal
+            (named_field_initializer
+              (identifier)
+              (identifier)))))))
+  (top_level_item
+    (function_declaration
+      (identifier)
+      (identifier)
+      (parameter_list
+        (parameter
+          (self_parameter
+            (self))))
+      (reference_type
+        (named_type
+          (identifier)))
+      (return_origin_clause
+        (in)
+        (self))
+      (block
+        (return_statement
+          (prefix_expression
+            (selector_expression
+              (self)
+              (identifier)))))))
+  (top_level_item
+    (function_declaration
+      (identifier)
+      (identifier)
+      (parameter_list
+        (parameter
+          (self_parameter
+            (mut)
+            (self)))
+        (parameter
+          (typed_parameter
+            (identifier)
+            (named_type
+              (identifier)))))
+      (block
+        (assignment_statement
+          (assignment_clause
+            (selector_expression
+              (self)
+              (identifier))
+            (identifier))))))
+  (top_level_item
+    (function_declaration
+      (identifier)
+      (identifier)
+      (parameter_list
+        (parameter
+          (self_parameter
+            (self))))
+      (named_type
+        (identifier))
+      (block
+        (return_statement
+          (selector_expression
+            (self)
+            (identifier))))))
+  (top_level_item
+    (function_declaration
+      (identifier)
+      (identifier)
+      (parameter_list
+        (parameter
+          (self_parameter
+            (mut)
+            (self))))
+      (named_type
+        (identifier))
+      (block
+        (return_statement
+          (self)))))
+  (top_level_item
+    (function_declaration
+      (identifier)
+      (parameter_list)
+      (block
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (call_expression
+              (scoped_identifier
+                (identifier)
+                (identifier))
+              (argument_list
+                (number_literal)))))
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (call_expression
+              (selector_expression
+                (identifier)
+                (identifier))
+              (argument_list))))))))
