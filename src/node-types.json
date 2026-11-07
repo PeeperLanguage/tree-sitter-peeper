@@ -8,6 +8,10 @@
         "named": true
       },
       {
+        "type": "array_type",
+        "named": true
+      },
+      {
         "type": "binary_expression",
         "named": true
       },
@@ -84,6 +88,10 @@
         "named": true
       },
       {
+        "type": "owned_pointer_type",
+        "named": true
+      },
+      {
         "type": "parenthesized_expression",
         "named": true
       },
@@ -100,6 +108,10 @@
         "named": true
       },
       {
+        "type": "raw_pointer_type",
+        "named": true
+      },
+      {
         "type": "scoped_identifier",
         "named": true
       },
@@ -109,6 +121,10 @@
       },
       {
         "type": "self",
+        "named": true
+      },
+      {
+        "type": "slice_type",
         "named": true
       },
       {
@@ -2729,6 +2745,10 @@
         "types": [
           {
             "type": "type",
+            "named": false
+          },
+          {
+            "type": "type",
             "named": true
           }
         ]
@@ -2739,7 +2759,7 @@
       "required": false,
       "types": [
         {
-          "type": "comptime",
+          "type": "const",
           "named": true
         },
         {
