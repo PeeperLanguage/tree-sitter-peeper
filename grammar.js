@@ -79,6 +79,7 @@ export default grammar({
 
   conflicts: ($) => [
     [$.expression, $.named_type],
+    [$.expression, $.type],
     [$.expression, $.generic_type],
     [$.expression, $.lambda_parameter],
     [$.expression, $.lambda_parameter, $.named_type],
@@ -253,15 +254,16 @@ export default grammar({
     // belongs to, so no type is written.
     self_parameter: ($) => seq(optional("&"), optional($.mut), $.self),
 
+    // `const T: type` takes a type, known when compiling.
     typed_parameter: ($) =>
       choice(
         seq(
-          optional($.comptime),
+          optional($.const),
           optional($.move),
           optional($.mut),
           field("name", $.identifier),
           ":",
-          field("type", $.type),
+          field("type", choice($.type, "type")),
           optional(seq("=", field("default", $.expression))),
         ),
         field("type", $.type),
@@ -476,6 +478,12 @@ export default grammar({
         $.array_literal,
         $.struct_literal,
         $.variant_literal,
+        // a type where a value could go, for an argument that takes one:
+        // `size_of(*Node)`, `size_of([4]i32)`, `size_of(&[]i32)`
+        $.owned_pointer_type,
+        $.raw_pointer_type,
+        $.array_type,
+        $.slice_type,
         $.identifier,
         $.self,
         $.scoped_identifier,
@@ -509,13 +517,17 @@ export default grammar({
       ),
 
     // `[N]T{ values }`, `[_]T{ ... }`, `[]T{ ... }` or `[..]T{ ... }`
+    // Above the type alone, so a `{` after the type starts its values.
     array_literal: ($) =>
-      seq(
-        field("type", choice($.array_type, $.slice_type)),
-        "{",
-        optional(commaSep1($.expression)),
-        optional(","),
-        "}",
+      prec(
+        1,
+        seq(
+          field("type", choice($.array_type, $.slice_type)),
+          "{",
+          optional(commaSep1($.expression)),
+          optional(","),
+          "}",
+        ),
       ),
 
     struct_literal: ($) =>

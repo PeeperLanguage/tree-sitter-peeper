@@ -1,0 +1,131 @@
+======================================
+Types where a value goes, and an array literal after a type
+======================================
+
+fn main() { f(*Node, rawptr, [4]i32, &[]i32, [2]u8{ 1, 2 }, a * b); }
+
+---
+
+(source_file
+  (top_level_item
+    (function_declaration
+      (identifier)
+      (parameter_list)
+      (block
+        (expression_statement
+          (call_expression
+            (identifier)
+            (argument_list
+              (owned_pointer_type
+                (named_type
+                  (identifier)))
+              (raw_pointer_type)
+              (array_type
+                (array_length
+                  (number_literal))
+                (named_type
+                  (identifier)))
+              (prefix_expression
+                (slice_type
+                  (named_type
+                    (identifier))))
+              (array_literal
+                (array_type
+                  (array_length
+                    (number_literal))
+                  (named_type
+                    (identifier)))
+                (number_literal)
+                (number_literal))
+              (binary_expression
+                (identifier)
+                (identifier)))))))))
+
+======================================
+A `const T: type` parameter
+======================================
+
+fn Size(const T: type, x: T) -> usize { return size_of(T); }
+
+---
+
+(source_file
+  (top_level_item
+    (function_declaration
+      (identifier)
+      (parameter_list
+        (parameter
+          (typed_parameter
+            (const)
+            (identifier)))
+        (parameter
+          (typed_parameter
+            (identifier)
+            (named_type
+              (identifier)))))
+      (named_type
+        (identifier))
+      (block
+        (return_statement
+          (call_expression
+            (identifier)
+            (argument_list
+              (identifier))))))))
+
+======================================
+A `const` value parameter, given a type and a value
+======================================
+
+fn Scaled(const factor: i64, x: i64) -> i64 { return x * factor; }
+fn main() { let a = Scaled(3, 4); let b = New(Node, &mut heap); }
+
+---
+
+(source_file
+  (top_level_item
+    (function_declaration
+      (identifier)
+      (parameter_list
+        (parameter
+          (typed_parameter
+            (const)
+            (identifier)
+            (named_type
+              (identifier))))
+        (parameter
+          (typed_parameter
+            (identifier)
+            (named_type
+              (identifier)))))
+      (named_type
+        (identifier))
+      (block
+        (return_statement
+          (binary_expression
+            (identifier)
+            (identifier))))))
+  (top_level_item
+    (function_declaration
+      (identifier)
+      (parameter_list)
+      (block
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (call_expression
+              (identifier)
+              (argument_list
+                (number_literal)
+                (number_literal)))))
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (call_expression
+              (identifier)
+              (argument_list
+                (identifier)
+                (prefix_expression
+                  (mut)
+                  (identifier))))))))))
