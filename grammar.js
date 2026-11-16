@@ -223,11 +223,23 @@ export default grammar({
         "fn",
         optional(seq(field("owner", $.identifier), "::")),
         field("name", $.identifier),
-        optional(field("type_parameters", $.type_parameter_list)),
         field("parameters", $.parameter_list),
         optional(seq("->", field("result", $.type))),
         optional(field("return_origins", $.return_origin_clause)),
+        optional(field("condition", $.where_clause)),
         choice(field("body", $.block), ";"),
+      ),
+
+    // where T: Shape, T: Sized(8): what must hold of what a call gives,
+    // after the result. Each item names what it checks, then an interface it
+    // must implement or a function it must pass, with any more arguments.
+    where_clause: ($) => seq("where", commaSep1($.where_item)),
+    where_item: ($) =>
+      seq(
+        field("subject", $.identifier),
+        ":",
+        field("constraint", choice($.identifier, $.scoped_identifier)),
+        optional(field("arguments", $.argument_list)),
       ),
 
     type_parameter_list: ($) =>
@@ -778,9 +790,12 @@ export default grammar({
         $.error_type,
         $.generic_type,
         $.named_type,
+        $.declared_type_parameter,
       ),
 
     named_type: ($) => choice($.identifier, $.scoped_identifier),
+    // $T in a function parameter's type declares the type parameter T.
+    declared_type_parameter: ($) => seq("$", field("name", $.identifier)),
     generic_type: ($) =>
       seq(
         field("name", choice($.identifier, $.scoped_identifier)),
@@ -867,7 +882,6 @@ export default grammar({
         seq(
           "fn",
           field("name", $.identifier),
-          optional(field("type_parameters", $.type_parameter_list)),
           field("parameters", $.parameter_list),
           optional(seq("->", field("result", $.type))),
           optional(field("return_origins", $.return_origin_clause)),
