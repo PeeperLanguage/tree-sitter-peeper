@@ -87,9 +87,9 @@ export default grammar({
     [$.lambda_parameter, $.named_type],
     [$.lambda_parameter, $.type],
     [$.named_type, $.generic_type],
-    [$.generic_call_expression, $.binary_expression],
-    [$.generic_call_expression, $.prefix_expression, $.binary_expression],
     [$.generic_type, $.variant_case],
+    // `Box::<i32>.{` is a struct literal, `Box::<i32>.x` a field: the `{` decides.
+    [$.expression, $.struct_literal],
   ],
 
   rules: {
@@ -223,14 +223,15 @@ export default grammar({
         "fn",
         optional(seq(field("owner", $.identifier), "::")),
         field("name", $.identifier),
+        optional(field("type_parameters", $.type_parameter_list)),
         field("parameters", $.parameter_list),
         optional(seq("->", field("result", $.type))),
         optional(field("return_origins", $.return_origin_clause)),
-        optional(field("condition", $.where_clause)),
+        optional(field("constraints", $.where_clause)),
         choice(field("body", $.block), ";"),
       ),
 
-    // where T: Shape, T: Sized(8): what must hold of what a call gives,
+    // where T: Shape, T: Sized(8): what the types and values a call gives must satisfy,
     // after the result. Each item names what it checks, then an interface it
     // must implement or a function it must pass, with any more arguments.
     where_clause: ($) => seq("where", commaSep1($.where_item)),
@@ -484,7 +485,7 @@ export default grammar({
         $.dereference_expression,
         $.index_expression,
         $.selector_expression,
-        $.generic_call_expression,
+        $.generic_path,
         $.call_expression,
         $.parenthesized_expression,
         $.array_literal,
@@ -544,7 +545,7 @@ export default grammar({
 
     struct_literal: ($) =>
       seq(
-        optional(field("type", choice($.named_type, $.generic_type))),
+        optional(field("type", choice($.named_type, $.generic_path))),
         ".",
         "{",
         optional(commaSep1($.named_field_initializer)),
@@ -577,17 +578,13 @@ export default grammar({
         ),
       ),
 
-    generic_call_expression: ($) =>
-      prec.left(
-        PREC.postfix,
-        seq(
-          field("function", $.expression),
-          "<",
-          field("type_arguments", commaSep1($.type)),
-          optional(","),
-          ">",
-          field("arguments", $.argument_list),
-        ),
+    // Max::<i32> in an expression, where `<` after a name compares: type
+    // arguments follow `::`.
+    generic_path: ($) =>
+      seq(
+        field("name", choice($.identifier, $.scoped_identifier)),
+        "::",
+        field("type_arguments", $.type_argument_list),
       ),
 
     argument_list: ($) =>
@@ -790,12 +787,9 @@ export default grammar({
         $.error_type,
         $.generic_type,
         $.named_type,
-        $.declared_type_parameter,
       ),
 
     named_type: ($) => choice($.identifier, $.scoped_identifier),
-    // $T in a function parameter's type declares the type parameter T.
-    declared_type_parameter: ($) => seq("$", field("name", $.identifier)),
     generic_type: ($) =>
       seq(
         field("name", choice($.identifier, $.scoped_identifier)),
@@ -882,6 +876,7 @@ export default grammar({
         seq(
           "fn",
           field("name", $.identifier),
+          optional(field("type_parameters", $.type_parameter_list)),
           field("parameters", $.parameter_list),
           optional(seq("->", field("result", $.type))),
           optional(field("return_origins", $.return_origin_clause)),
@@ -900,7 +895,7 @@ export default grammar({
         seq(
           field(
             "scope",
-            choice($.identifier, $.scoped_identifier, $.generic_type),
+            choice($.identifier, $.scoped_identifier, $.generic_type, $.generic_path),
           ),
           "::",
           field("name", $.identifier),

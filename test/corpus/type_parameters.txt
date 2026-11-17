@@ -1,10 +1,10 @@
 ======================================
-Type parameters declared with `$`, and a `where` list
+Type parameters, a `where` list, and types written after `::` in an expression
 ======================================
 
-fn Largest(a: $T, b: T) -> T where T: Number { return a; }
-fn Times(const N: i32, value: $T) -> T where T: Shape, T: Sized(8), N: math::Positive { return value; }
-fn First(list: &[]$T) -> T { return list[0]; }
+fn Largest<T>(a: T, b: T) -> T where T: Number { return a; }
+fn Times<T>(const N: i32, value: T) -> T where T: Shape, T: Sized(8), N: math::Positive { return value; }
+fn main() { Zero::<u8>(); let f = Max::<i32>; }
 
 ---
 
@@ -12,11 +12,14 @@ fn First(list: &[]$T) -> T { return list[0]; }
   (top_level_item
     (function_declaration
       (identifier)
+      (type_parameter_list
+        (type_parameter
+          (identifier)))
       (parameter_list
         (parameter
           (typed_parameter
             (identifier)
-            (declared_type_parameter
+            (named_type
               (identifier))))
         (parameter
           (typed_parameter
@@ -35,6 +38,9 @@ fn First(list: &[]$T) -> T { return list[0]; }
   (top_level_item
     (function_declaration
       (identifier)
+      (type_parameter_list
+        (type_parameter
+          (identifier)))
       (parameter_list
         (parameter
           (typed_parameter
@@ -45,7 +51,7 @@ fn First(list: &[]$T) -> T { return list[0]; }
         (parameter
           (typed_parameter
             (identifier)
-            (declared_type_parameter
+            (named_type
               (identifier)))))
       (named_type
         (identifier))
@@ -69,18 +75,87 @@ fn First(list: &[]$T) -> T { return list[0]; }
   (top_level_item
     (function_declaration
       (identifier)
+      (parameter_list)
+      (block
+        (expression_statement
+          (call_expression
+            (generic_path
+              (identifier)
+              (type_argument_list
+                (named_type
+                  (identifier))))
+            (argument_list)))
+        (let_statement
+          (let_clause
+            (let)
+            (identifier)
+            (generic_path
+              (identifier)
+              (type_argument_list
+                (named_type
+                  (identifier))))))))))
+
+======================================
+A `where` list over lines, and `<` in an expression compares
+======================================
+
+fn Wide<T>(value: T) -> usize
+where
+    T: AddressWide,
+    T: Sized(8)
+{
+    let c = f(a < b, c > (d));
+    if a < b && c > (d) { }
+}
+
+---
+
+(source_file
+  (top_level_item
+    (function_declaration
+      (identifier)
+      (type_parameter_list
+        (type_parameter
+          (identifier)))
       (parameter_list
         (parameter
           (typed_parameter
             (identifier)
-            (reference_type
-              (slice_type
-                (declared_type_parameter
-                  (identifier)))))))
+            (named_type
+              (identifier)))))
       (named_type
         (identifier))
+      (where_clause
+        (where_item
+          (identifier)
+          (identifier))
+        (where_item
+          (identifier)
+          (identifier)
+          (argument_list
+            (number_literal))))
       (block
-        (return_statement
-          (index_expression
+        (let_statement
+          (let_clause
+            (let)
             (identifier)
-            (number_literal)))))))
+            (call_expression
+              (identifier)
+              (argument_list
+                (binary_expression
+                  (identifier)
+                  (identifier))
+                (binary_expression
+                  (identifier)
+                  (parenthesized_expression
+                    (identifier)))))))
+        (if_statement
+          (binary_expression
+            (binary_expression
+              (identifier)
+              (identifier))
+            (binary_expression
+              (identifier)
+              (parenthesized_expression
+                (identifier))))
+          (block))))))

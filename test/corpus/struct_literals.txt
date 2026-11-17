@@ -6,14 +6,14 @@ fn literals() {
     let empty = Point.{};
     let point = Point.{ x = 1, y = 2, };
     let inferred: Point = .{ x = 1, y = 2 };
-    let nested = Box<Point>.{ value = Point.{ x = 3, y = 4 } };
-    let inferred_nested = Box<Point>.{ value = .{ x = 3, y = 4 } };
+    let nested = Box::<Point>.{ value = Point.{ x = 3, y = 4 } };
+    let inferred_nested = Box::<Point>.{ value = .{ x = 3, y = 4 } };
     let qualified = geometry::Point.{ x = 5, y = 6 };
     let deep = pkg::geometry::Point.{};
-    let generic = pkg::Box<Point>.{ value = point };
-    let nested_generic = Box<Box<Point>>.{ value = nested };
-    let generic_scope = Outer<i32>::Inner<Point>.{ value = point };
-    let scoped = Outer<i32>::Inner.{};
+    let generic = pkg::Box::<Point>.{ value = point };
+    let nested_generic = Box::<Box<Point>>.{ value = nested };
+    let generic_scope = Outer::<i32>::Inner::<Point>.{ value = point };
+    let scoped = Outer::<i32>::Inner.{};
     let field = Point.{ x = 1 }.x;
     let method = Point.{ x = 1 }.check();
     consume(Point.{ x = 1 });
@@ -66,7 +66,7 @@ fn literals() {
             (let)
             (identifier)
             (struct_literal
-              (generic_type
+              (generic_path
                 (identifier)
                 (type_argument_list
                   (named_type
@@ -87,7 +87,7 @@ fn literals() {
             (let)
             (identifier)
             (struct_literal
-              (generic_type
+              (generic_path
                 (identifier)
                 (type_argument_list
                   (named_type
@@ -132,7 +132,7 @@ fn literals() {
             (let)
             (identifier)
             (struct_literal
-              (generic_type
+              (generic_path
                 (scoped_identifier
                   (identifier)
                   (identifier))
@@ -147,7 +147,7 @@ fn literals() {
             (let)
             (identifier)
             (struct_literal
-              (generic_type
+              (generic_path
                 (identifier)
                 (type_argument_list
                   (generic_type
@@ -163,9 +163,9 @@ fn literals() {
             (let)
             (identifier)
             (struct_literal
-              (generic_type
+              (generic_path
                 (scoped_identifier
-                  (generic_type
+                  (generic_path
                     (identifier)
                     (type_argument_list
                       (named_type
@@ -184,7 +184,7 @@ fn literals() {
             (struct_literal
               (named_type
                 (scoped_identifier
-                  (generic_type
+                  (generic_path
                     (identifier)
                     (type_argument_list
                       (named_type
@@ -241,21 +241,21 @@ Struct literals in control headers
 fn headers() {
     if Flag.{ value = true } {}
     for Flag.{ value = true } {}
-    for item in pkg::Items<i32>.{} {}
-    match Wrapper.{} { Result<i32>::Pending => {} }
+    for item in pkg::Items::<i32>.{} {}
+    match Wrapper.{} { Result::<i32>::Pending => {} }
     if .{ value = true } {}
     let empty: Point = .{};
     if Point.{ x = 1 }.ready() {}
-    if pkg::Box<i32>.{ value = 1 }.ready() {} else {}
+    if pkg::Box::<i32>.{ value = 1 }.ready() {} else {}
     for Point.{ x = 1 }.ready() {}
-    for item in pkg::Box<i32>.{ value = 1 }.items() {}
-    match Result<Point>::Ok with Point.{ x = 1 } {
-        Result<Point>::Ok with point => {}
+    for item in pkg::Box::<i32>.{ value = 1 }.items() {}
+    match Result::<Point>::Ok with Point.{ x = 1 } {
+        Result::<Point>::Ok with point => {}
     }
     if ready {}
     for ready {}
     for item in items {}
-    match result { Result<Point>::Pending => {} }
+    match result { Result::<Point>::Pending => {} }
 }
 
 ---
@@ -287,7 +287,7 @@ fn headers() {
             (identifier)
             (in)
             (struct_literal
-              (generic_type
+              (generic_path
                 (scoped_identifier
                   (identifier)
                   (identifier))
@@ -303,7 +303,7 @@ fn headers() {
             (variant_pattern
               (variant_case
                 (scoped_identifier
-                  (generic_type
+                  (generic_path
                     (identifier)
                     (type_argument_list
                       (named_type
@@ -339,7 +339,7 @@ fn headers() {
           (call_expression
             (selector_expression
               (struct_literal
-                (generic_type
+                (generic_path
                   (scoped_identifier
                     (identifier)
                     (identifier))
@@ -372,7 +372,7 @@ fn headers() {
             (call_expression
               (selector_expression
                 (struct_literal
-                  (generic_type
+                  (generic_path
                     (scoped_identifier
                       (identifier)
                       (identifier))
@@ -389,7 +389,7 @@ fn headers() {
           (variant_literal
             (variant_case
               (scoped_identifier
-                (generic_type
+                (generic_path
                   (identifier)
                   (type_argument_list
                     (named_type
@@ -406,7 +406,7 @@ fn headers() {
             (variant_pattern
               (variant_case
                 (scoped_identifier
-                  (generic_type
+                  (generic_path
                     (identifier)
                     (type_argument_list
                       (named_type
@@ -433,7 +433,7 @@ fn headers() {
             (variant_pattern
               (variant_case
                 (scoped_identifier
-                  (generic_type
+                  (generic_path
                     (identifier)
                     (type_argument_list
                       (named_type
@@ -446,10 +446,10 @@ Enum with named and inferred struct payloads
 ==================
 
 fn payloads() {
-    let named = Result<Point>::Ok with Point.{ x = 1 };
-    let inferred = Result<Point>::Ok with .{ x = 1 };
-    let scalar = Result<i32>::Ok with 1;
-    let unit = Result<i32>::Pending;
+    let named = Result::<Point>::Ok with Point.{ x = 1 };
+    let inferred = Result::<Point>::Ok with .{ x = 1 };
+    let scalar = Result::<i32>::Ok with 1;
+    let unit = Result::<i32>::Pending;
 }
 
 ---
@@ -467,7 +467,7 @@ fn payloads() {
             (variant_literal
               (variant_case
                 (scoped_identifier
-                  (generic_type
+                  (generic_path
                     (identifier)
                     (type_argument_list
                       (named_type
@@ -487,7 +487,7 @@ fn payloads() {
             (variant_literal
               (variant_case
                 (scoped_identifier
-                  (generic_type
+                  (generic_path
                     (identifier)
                     (type_argument_list
                       (named_type
@@ -505,7 +505,7 @@ fn payloads() {
             (variant_literal
               (variant_case
                 (scoped_identifier
-                  (generic_type
+                  (generic_path
                     (identifier)
                     (type_argument_list
                       (named_type
@@ -518,7 +518,7 @@ fn payloads() {
             (let)
             (identifier)
             (scoped_identifier
-              (generic_type
+              (generic_path
                 (identifier)
                 (type_argument_list
                   (named_type
